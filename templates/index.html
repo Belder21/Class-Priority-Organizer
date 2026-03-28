@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assignment Tracker</title>
+</head>
+
+
+<body>
+    <h1>My Assignments</h1>
+
+    <form method="POST" action="/add">
+        <input type="text" name="course" placeholder="Course name" required>
+        <input type="text" name="assignment" placeholder="Assignment name" required>
+        <input type="date" name="due_date" placeholder="Due Date" required>
+        <input type="number" name="hours" placeholder="Estimated Hours" required>
+        <input type="number" name="points" placeholder="Number of Points Worth" required>
+        <button type="submit"> Add Assignments</button>
+    </form>
+
+    <h2>Current Assignments</h2>
+    <ul>
+        {% for assignment in assignments %}
+        <li>{{ assignment.course }} - {{ assignment.name }} - (Due: {{ assignment.due_date }} )</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
