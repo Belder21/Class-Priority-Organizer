@@ -1,101 +1,867 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Assignment Tracker</title>
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyDesk</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171f;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: rgba(15, 221, 221, 0.81);
+    --accent2: #fc6c9c;
+    --accent3: #6cfcb8;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --warn: #fcb86c;
+    --danger: #fc6c6c;
+    --radius: 14px;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    background-image: radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124,108,252,0.12) 0%, transparent 60%),
+                      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(252,108,156,0.08) 0%, transparent 60%);
+  }
+
+  /* ---- LAYOUT ---- */
+  .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo span { color: var(--accent); }
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    width: 100%;
+  }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: rgba(124,108,252,0.15); color: var(--accent); }
+  .nav-btn .icon { font-size: 1.1rem; width: 20px; text-align: center; }
+
+  /* ---- MAIN ---- */
+  .main { padding: 32px 36px; }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+  .page-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; }
+  .page-title span { color: var(--accent); }
+
+  /* ---- TABS / SECTIONS ---- */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+  .card-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* ---- ADD FORM ---- */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .field input, .field select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field select option { background: var(--surface2); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 20px;
+    border-radius: 9px;
+    border: none;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #537ee1; transform: translateY(-1px); }
+  .btn-sm { padding: 6px 13px; font-size: 0.78rem; }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: rgba(252,108,108,0.12); color: var(--danger); border: 1px solid rgba(252,108,108,0.2); }
+  .btn-danger:hover { background: rgba(252,108,108,0.25); }
+
+  /* ---- PRIORITY LIST ---- */
+  .priority-list { display: flex; flex-direction: column; gap: 10px; }
+  .priority-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    transition: border-color 0.15s;
+  }
+  .priority-item:hover { border-color: rgba(124,108,252,0.4); }
+  .rank-badge {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 800;
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+  .rank-1 { background: rgba(252,184,108,0.2); color: var(--warn); }
+  .rank-2 { background: rgba(124,108,252,0.15); color: var(--accent); }
+  .rank-3 { background: rgba(108,252,184,0.12); color: var(--accent3); }
+  .rank-other { background: var(--surface); color: var(--muted); }
+
+  .item-info { display: flex; flex-direction: column; gap: 5px; }
+  .item-name { font-size: 0.95rem; font-weight: 700; }
+  .item-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: 0.68rem; font-weight: 600; padding: 2px 8px;
+    border-radius: 99px; font-family: var(--font-mono);
+  }
+  .tag-course { background: rgba(124,108,252,0.15); color: var(--accent); }
+  .tag-due { background: rgba(252,108,108,0.13); color: var(--danger); }
+  .tag-due-ok { background: rgba(108,252,184,0.12); color: var(--accent3); }
+  .tag-score { background: rgba(252,184,108,0.15); color: var(--warn); }
+
+  .priority-bar-wrap { margin-top: 6px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; width: 100%; }
+  .priority-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.6s ease; }
+
+  .item-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+
+  /* status select */
+  .status-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 4px 8px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  /* Timer inline */
+  .timer-row { display: flex; align-items: center; gap: 7px; margin-top: 6px; flex-wrap: wrap; }
+  .timer-input {
+    width: 62px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 5px 8px;
+    outline: none;
+  }
+  .timer-input:focus { border-color: var(--accent); }
+  .timer-display {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--accent3);
+    min-width: 90px;
+  }
+
+  /* Notes */
+  .note-area {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 56px;
+    outline: none;
+    margin-top: 6px;
+    transition: border-color 0.15s;
+  }
+  .note-area:focus { border-color: var(--accent); }
+
+  /* ---- CALENDAR ---- */
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .cal-header { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--muted); padding: 6px 0; letter-spacing: 0.06em; }
+  .cal-day {
+    min-height: 72px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px;
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    position: relative;
+  }
+  .cal-day.today { border-color: var(--accent); }
+  .cal-day.other-month { opacity: 0.35; }
+  .cal-day-num { font-weight: 500; color: var(--muted); margin-bottom: 4px; }
+  .cal-day.today .cal-day-num { color: var(--accent); font-weight: 800; }
+  .cal-event {
+    background: rgba(124,108,252,0.25);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.62rem;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+  }
+  .cal-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .cal-nav-title { font-size: 1.1rem; font-weight: 800; flex: 1; }
+  .month-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0 8px; }
+
+  /* ---- POMODORO (full) ---- */
+  .pomo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 0;
+  }
+  .pomo-ring-svg { position: relative; }
+  .pomo-ring-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
+  .pomo-ring-arc { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.3s; transform-origin: center; transform: rotate(-90deg); }
+  .pomo-time {
+    font-size: 2.4rem; font-weight: 800; font-family: var(--font-mono); letter-spacing: -0.03em; text-align: center;
+  }
+  .pomo-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .pomo-controls { display: flex; gap: 10px; }
+  .pomo-sessions { display: flex; gap: 6px; }
+  .pomo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
+  .pomo-dot.done { background: var(--accent); }
+  .pomo-settings { display: flex; gap: 12px; margin-top: 4px; }
+  .pomo-setting { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .pomo-setting label { font-size: 0.65rem; color: var(--muted); font-weight: 600; letter-spacing: 0.06em; }
+  .pomo-setting input {
+    width: 64px; text-align: center;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 7px; color: var(--text); font-family: var(--font-mono);
+    font-size: 0.85rem; padding: 6px 8px; outline: none;
+  }
+
+  /* ---- STATS ---- */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .stat-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .stat-value { font-size: 1.9rem; font-weight: 800; font-family: var(--font-mono); letter-spacing: -0.04em; }
+  .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+  .progress-list { display: flex; flex-direction: column; gap: 10px; }
+  .progress-item { display: flex; flex-direction: column; gap: 5px; }
+  .progress-item-header { display: flex; justify-content: space-between; font-size: 0.82rem; }
+  .progress-item-name { font-weight: 600; }
+  .progress-item-pct { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+  .progress-track { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+
+  /* ---- SCROLLBAR ---- */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  /* ---- TOAST ---- */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface2); border: 1px solid var(--accent);
+    color: var(--text); font-size: 0.83rem; font-weight: 600;
+    padding: 10px 18px; border-radius: 10px;
+    opacity: 0; transform: translateY(8px);
+    transition: all 0.25s; pointer-events: none; z-index: 999;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 800px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; padding: 16px; }
+    .main { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="logo">Study<span>Desk</span></div>
+    <button class="nav-btn active" onclick="showSection('dashboard')"><span class="icon">⚡</span> Dashboard</button>
+    <button class="nav-btn" onclick="showSection('add')"><span class="icon">＋</span> Add Assignment</button>
+    <button class="nav-btn" onclick="showSection('calendar')"><span class="icon">📅</span> Calendar</button>
+    <button class="nav-btn" onclick="showSection('pomodoro')"><span class="icon">🍅</span> Focus Timer</button>
+    <button class="nav-btn" onclick="showSection('progress')"><span class="icon">📊</span> Progress</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section id="section-dashboard" class="section active">
+      <div class="page-header">
+        <div class="page-title">Priority <span>Queue</span></div>
+      </div>
+
+      {% if pq %}
+      <div class="priority-list">
+        {% for score, assignment_name in pq %}
+        {% set asgn = assignments | selectattr('assignment', 'equalto', assignment_name) | first %}
+        {% set idx = loop.index %}
+        <div class="priority-item" id="item-{{ idx }}">
+          <div class="rank-badge {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% else %}rank-other{% endif %}">
+            #{{ loop.index }}
+          </div>
+          <div class="item-info">
+            <div class="item-name">{{ assignment_name }}</div>
+            <div class="item-meta">
+              {% if asgn %}
+              <span class="tag tag-course">{{ asgn.course }}</span>
+              {% set days_left = ((asgn.due_date | string) | days_from_today) %}
+              <span class="tag {% if days_left <= 2 %}tag-due{% else %}tag-due-ok{% endif %}">Due {{ asgn.due_date }}</span>
+              {% if asgn.counts_for_major %}<span class="tag" style="background:rgba(108,252,184,0.1);color:var(--accent3);">Major</span>{% endif %}
+              {% if asgn.career_relevant %}<span class="tag" style="background:rgba(252,184,108,0.12);color:var(--warn);">Career</span>{% endif %}
+              {% endif %}
+              <span class="tag tag-score">{{ score | round(1) }}%</span>
+            </div>
+            <div class="priority-bar-wrap"><div class="priority-bar" style="width:{{ score }}%"></div></div>
+
+            <!-- Timer row -->
+            <div class="timer-row">
+              <input type="text" class="timer-input" id="time-input-{{ idx }}" placeholder="25:00">
+              <button class="btn btn-ghost btn-sm" onclick="startWorkTimer({{ idx }}, '{{ assignment_name }}')">▶ Start</button>
+              <button class="btn btn-sm" style="background:rgba(108,252,184,0.1);color:var(--accent3);border:1px solid rgba(108,252,184,0.2);" onclick="stopTimer()">■ Stop</button>
+              <span class="timer-display" id="timer-display-{{ idx }}"></span>
+            </div>
+
+            <!-- Notes -->
+            <textarea class="note-area" id="note-{{ idx }}" placeholder="Add notes for this assignment..." onblur="saveNote('{{ assignment_name }}', {{ idx }})">{{ notes.get(assignment_name, '') }}</textarea>
+          </div>
+          <div class="item-actions">
+            <select class="status-select" onchange="updateStatus('{{ assignment_name }}', this.value)">
+              <option value="not started" {% if asgn and asgn.status == 'not started' %}selected{% endif %}>Not Started</option>
+              <option value="in progress" {% if asgn and asgn.status == 'in progress' %}selected{% endif %}>In Progress</option>
+              <option value="done" {% if asgn and asgn.status == 'done' %}selected{% endif %}>Done ✓</option>
+            </select>
+            <button class="btn btn-danger btn-sm" onclick="deleteAssignment('{{ assignment_name }}')">✕ Remove</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card" style="text-align:center;padding:48px;color:var(--muted);">
+        <div style="font-size:2.5rem;margin-bottom:12px;">📚</div>
+        <div style="font-weight:700;margin-bottom:6px;">No assignments yet</div>
+        <div style="font-size:0.85rem;">Add your first assignment to get started</div>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="showSection('add')">+ Add Assignment</button>
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- ADD ASSIGNMENT -->
+    <section id="section-add" class="section">
+      <div class="page-header">
+        <div class="page-title">Add <span>Assignment</span></div>
+      </div>
+      <div class="card">
+        <form method="POST" action="/add">
+          <div class="form-grid">
+            <div class="field">
+              <label>Course Name</label>
+              <input type="text" name="course" placeholder="e.g. CS 3140" required>
+            </div>
+            <div class="field">
+              <label>Assignment Name</label>
+              <input type="text" name="assignment" placeholder="e.g. Project 2" required>
+            </div>
+            <div class="field">
+              <label>Due Date</label>
+              <input type="date" name="due_date" required>
+            </div>
+            <div class="field">
+              <label>Est. Hours</label>
+              <input type="number" name="hours" placeholder="3" min="0.5" step="0.5" required>
+            </div>
+            <div class="field">
+              <label>Point Value</label>
+              <input type="number" name="points" placeholder="100" required>
+            </div>
+            <div class="field">
+              <label>% of Course Grade</label>
+              <input type="number" name="grade_weight" placeholder="20" min="0" max="100" required>
+            </div>
+            <div class="field">
+              <label>Course Importance (1–5)</label>
+              <input type="number" name="course_importance" placeholder="3" min="1" max="5" required>
+            </div>
+            <div class="field">
+              <label>Credit Hours</label>
+              <input type="number" name="credits" placeholder="3" min="1" max="6" step="0.5" required>
+            </div>
+            <div class="field">
+              <label>Counts for Major?</label>
+              <select name="counts_for_major">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Career Relevant?</label>
+              <select name="career_relevance">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">＋ Add Assignment</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="section-calendar" class="section">
+      <div class="page-header">
+        <div class="page-title">Due Date <span>Calendar</span></div>
+      </div>
+      <div class="card">
+        <div class="cal-nav">
+          <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">← Prev</button>
+          <div class="cal-nav-title" id="cal-title"></div>
+          <button class="btn btn-ghost btn-sm" onclick="calNav(1)">Next →</button>
+        </div>
+        <div class="calendar-grid" id="cal-days-header">
+          <div class="cal-header">SUN</div>
+          <div class="cal-header">MON</div>
+          <div class="cal-header">TUE</div>
+          <div class="cal-header">WED</div>
+          <div class="cal-header">THU</div>
+          <div class="cal-header">FRI</div>
+          <div class="cal-header">SAT</div>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+      </div>
+    </section>
+
+    <!-- POMODORO -->
+    <section id="section-pomodoro" class="section">
+      <div class="page-header">
+        <div class="page-title">Focus <span>Timer</span></div>
+      </div>
+      <div class="card">
+        <div class="pomo-wrap">
+          <div class="pomo-settings">
+            <div class="pomo-setting">
+              <label>WORK (min)</label>
+              <input type="number" id="pomo-work-min" value="25" min="1" max="90">
+            </div>
+            <div class="pomo-setting">
+              <label>SHORT BREAK</label>
+              <input type="number" id="pomo-break-min" value="5" min="1" max="30">
+            </div>
+            <div class="pomo-setting">
+              <label>LONG BREAK</label>
+              <input type="number" id="pomo-long-min" value="15" min="1" max="60">
+            </div>
+          </div>
+
+          <svg class="pomo-ring-svg" width="180" height="180" viewBox="0 0 180 180">
+            <circle class="pomo-ring-bg" cx="90" cy="90" r="80"/>
+            <circle class="pomo-ring-arc" id="pomo-arc" cx="90" cy="90" r="80"
+              stroke-dasharray="502.65" stroke-dashoffset="0"/>
+          </svg>
+          <div style="margin-top:-140px; margin-bottom: 100px; text-align:center; pointer-events:none;">
+            <div class="pomo-time" id="pomo-display">25:00</div>
+            <div class="pomo-label" id="pomo-phase-label">WORK SESSION</div>
+          </div>
+
+          <div class="pomo-sessions" id="pomo-dots">
+            <div class="pomo-dot"></div>
+            <div class="pomo-dot"></div>
+            <div class="pomo-dot"></div>
+            <div class="pomo-dot"></div>
+          </div>
+
+          <div class="pomo-controls">
+            <button class="btn btn-primary" id="pomo-start-btn" onclick="pomoToggle()">▶ Start</button>
+            <button class="btn btn-ghost" onclick="pomoReset()">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section id="section-progress" class="section">
+      <div class="page-header">
+        <div class="page-title">Progress <span>Tracking</span></div>
+      </div>
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="card">
+        <div class="card-title">Assignment Progress</div>
+        <div class="progress-list" id="progress-list"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast"></div>
 
 <script>
-    let activeTimer = null;
-    let currentIndex = null;
+// ============================================================
+// DATA FROM FLASK
+// ============================================================
+const calendarEvents = {{ calendar_events | safe }};
+const assignmentsData = {{ assignments | tojson | safe }};
 
-    function startWorkTimer(index, assignmentName) {
-        const input = document.getElementById(`time-input-${index}`).value;
-        const parts = input.split(':');
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
 
-        if (parts.length !== 2) {
-            alert('Enter time as MM:SS (e.g., 30:00)');
-            return;
-        }
+  if (id === 'calendar') renderCalendar();
+  if (id === 'progress') renderProgress();
+}
 
-        const minutes = parseInt(parts[0]);
-        const seconds = parseInt(parts[1]);
-        const totalSeconds = (minutes * 60) + seconds;
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
 
-        runTimer(index, totalSeconds, 'work', assignmentName);
+// ============================================================
+// WORK TIMER (inline per-assignment)
+// ============================================================
+let activeTimer = null;
+
+function startWorkTimer(index, assignmentName) {
+  const input = document.getElementById(`time-input-${index}`).value || '25:00';
+  const parts = input.split(':');
+  if (parts.length !== 2) { alert('Use MM:SS format'); return; }
+  const totalSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  runTimer(index, totalSeconds, 'work', assignmentName);
+}
+
+function startBreakTimer(index) {
+  runTimer(index, 300, 'break', null);
+}
+
+function stopTimer() {
+  if (activeTimer) { clearInterval(activeTimer); activeTimer = null; }
+}
+
+function runTimer(index, totalSeconds, type, assignmentName) {
+  if (activeTimer) clearInterval(activeTimer);
+  let remaining = totalSeconds;
+  const display = document.getElementById(`timer-display-${index}`);
+  const label = type === 'work' ? '🍅' : '☕';
+
+  activeTimer = setInterval(() => {
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    display.textContent = `${label} ${m}:${s < 10 ? '0' : ''}${s}`;
+
+    if (remaining <= 0) {
+      clearInterval(activeTimer);
+      if (type === 'work') {
+        display.textContent = '✓ Done! Break starting…';
+        setTimeout(() => startBreakTimer(index), 2000);
+      } else {
+        display.textContent = '☕ Break over!';
+        showToast('Break finished! Time to get back to it.');
+      }
     }
+    remaining--;
+  }, 1000);
+}
 
-    function startBreakTimer(index) {
-        runTimer(index, 300, 'break', null); // 5 minutes = 300 seconds
+// ============================================================
+// POMODORO
+// ============================================================
+let pomoInterval = null;
+let pomoRunning = false;
+let pomoPhase = 'work'; // work | break | long
+let pomoSession = 0;
+let pomoRemaining = 0;
+const circumference = 2 * Math.PI * 80; // 502.65
+
+function pomoGetWork()  { return (parseInt(document.getElementById('pomo-work-min').value) || 25) * 60; }
+function pomoGetBreak() { return (parseInt(document.getElementById('pomo-break-min').value) || 5) * 60; }
+function pomoGetLong()  { return (parseInt(document.getElementById('pomo-long-min').value) || 15) * 60; }
+
+function pomoReset() {
+  if (pomoInterval) clearInterval(pomoInterval);
+  pomoRunning = false; pomoPhase = 'work'; pomoSession = 0;
+  pomoRemaining = pomoGetWork();
+  updatePomoDisplay(pomoRemaining, pomoGetWork());
+  document.getElementById('pomo-phase-label').textContent = 'WORK SESSION';
+  document.getElementById('pomo-start-btn').textContent = '▶ Start';
+  document.querySelectorAll('.pomo-dot').forEach(d => d.classList.remove('done'));
+}
+
+function pomoToggle() {
+  if (pomoRunning) {
+    clearInterval(pomoInterval);
+    pomoRunning = false;
+    document.getElementById('pomo-start-btn').textContent = '▶ Resume';
+  } else {
+    if (pomoRemaining === 0) {
+      pomoRemaining = pomoGetWork();
+      pomoPhase = 'work';
     }
+    pomoRunning = true;
+    document.getElementById('pomo-start-btn').textContent = '⏸ Pause';
+    const totalForPhase = pomoPhase === 'work' ? pomoGetWork() : pomoPhase === 'long' ? pomoGetLong() : pomoGetBreak();
+    pomoInterval = setInterval(() => pomoTick(totalForPhase), 1000);
+  }
+}
 
-    function runTimer(index, totalSeconds, type, assignmentName) {
-        if (activeTimer) {
-            clearInterval(activeTimer);
-        }
-
-        currentIndex = index;
-        let remaining = totalSeconds;
-        const display = document.getElementById(`timer-display-${index}`);
-
-        const label = type === 'work' ? 'Work' : 'Break';
-
-        activeTimer = setInterval(() => {
-            const mins = Math.floor(remaining / 60);
-            const secs = remaining % 60;
-
-            display.textContent = `${label}: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
-
-            if (remaining <= 0) {
-                clearInterval(activeTimer);
-
-                if (type === 'work') {
-                    display.textContent = 'Work done! Starting break...';
-                    setTimeout(() => startBreakTimer(index), 2000);
-                } else {
-                    display.textContent = 'Break over!';
-                    alert('Break finished! Ready to work again?');
-                }
-            }
-
-            remaining--;
-        }, 1000);
+function pomoTick(total) {
+  if (pomoRemaining <= 0) {
+    clearInterval(pomoInterval);
+    pomoRunning = false;
+    if (pomoPhase === 'work') {
+      pomoSession++;
+      updatePomoDots();
+      const isLong = pomoSession % 4 === 0;
+      pomoPhase = isLong ? 'long' : 'break';
+      pomoRemaining = isLong ? pomoGetLong() : pomoGetBreak();
+      document.getElementById('pomo-phase-label').textContent = isLong ? 'LONG BREAK' : 'SHORT BREAK';
+      showToast(isLong ? '🎉 Long break time!' : '☕ Short break time!');
+      document.getElementById('pomo-arc').style.stroke = 'var(--accent3)';
+    } else {
+      pomoPhase = 'work';
+      pomoRemaining = pomoGetWork();
+      document.getElementById('pomo-phase-label').textContent = 'WORK SESSION';
+      showToast('🍅 Break over — back to work!');
+      document.getElementById('pomo-arc').style.stroke = 'var(--accent)';
     }
+    const newTotal = pomoPhase === 'work' ? pomoGetWork() : pomoPhase === 'long' ? pomoGetLong() : pomoGetBreak();
+    updatePomoDisplay(pomoRemaining, newTotal);
+    document.getElementById('pomo-start-btn').textContent = '▶ Start';
+    return;
+  }
+  pomoRemaining--;
+  updatePomoDisplay(pomoRemaining, total);
+}
+
+function updatePomoDisplay(remaining, total) {
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  document.getElementById('pomo-display').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+  const offset = circumference * (1 - remaining / total);
+  document.getElementById('pomo-arc').style.strokeDashoffset = offset;
+}
+
+function updatePomoDots() {
+  const dots = document.querySelectorAll('.pomo-dot');
+  dots.forEach((d, i) => { if (i < pomoSession % 4 || (pomoSession % 4 === 0 && pomoSession > 0)) d.classList.add('done'); });
+  if (pomoSession % 4 === 0 && pomoSession > 0) dots.forEach(d => setTimeout(() => d.classList.remove('done'), 500));
+}
+
+// init pomo
+window.addEventListener('DOMContentLoaded', () => {
+  pomoRemaining = pomoGetWork();
+  updatePomoDisplay(pomoRemaining, pomoGetWork());
+});
+
+// ============================================================
+// CALENDAR
+// ============================================================
+let calYear, calMonth;
+(function() { const n = new Date(); calYear = n.getFullYear(); calMonth = n.getMonth(); })();
+
+function calNav(dir) { calMonth += dir; if (calMonth > 11) { calMonth = 0; calYear++; } if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+
+function renderCalendar() {
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-title').textContent = `${monthNames[calMonth]} ${calYear}`;
+
+  const today = new Date();
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const prevDays = new Date(calYear, calMonth, 0).getDate();
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Map events to date strings
+  const eventMap = {};
+  calendarEvents.forEach(ev => { if (!eventMap[ev.date]) eventMap[ev.date] = []; eventMap[ev.date].push(ev); });
+
+  // Prev month padding
+  for (let i = 0; i < firstDay; i++) {
+    const d = document.createElement('div');
+    d.className = 'cal-day other-month';
+    d.innerHTML = `<div class="cal-day-num">${prevDays - firstDay + 1 + i}</div>`;
+    grid.appendChild(d);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+    const div = document.createElement('div');
+    div.className = 'cal-day' + (isToday ? ' today' : '');
+    let html = `<div class="cal-day-num">${d}</div>`;
+    if (eventMap[dateStr]) {
+      eventMap[dateStr].forEach(ev => { html += `<div class="cal-event" title="${ev.title}">${ev.title}</div>`; });
+    }
+    div.innerHTML = html;
+    grid.appendChild(div);
+  }
+
+  // Fill remaining
+  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+  for (let i = 1; i <= totalCells - firstDay - daysInMonth; i++) {
+    const d = document.createElement('div');
+    d.className = 'cal-day other-month';
+    d.innerHTML = `<div class="cal-day-num">${i}</div>`;
+    grid.appendChild(d);
+  }
+}
+
+// ============================================================
+// PROGRESS
+// ============================================================
+function renderProgress() {
+  const total = assignmentsData.length;
+  const done = assignmentsData.filter(a => a.status === 'done').length;
+  const inProgress = assignmentsData.filter(a => a.status === 'in progress').length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  const statsGrid = document.getElementById('stats-grid');
+  statsGrid.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Assignments</div><div class="stat-value">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" style="color:var(--accent3)">${done}</div></div>
+    <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value" style="color:var(--warn)">${inProgress}</div></div>
+    <div class="stat-card"><div class="stat-label">Completion Rate</div><div class="stat-value" style="color:var(--accent)">${pct}%</div></div>
+  `;
+
+  const colors = ['var(--accent)', 'var(--accent2)', 'var(--accent3)', 'var(--warn)'];
+  const list = document.getElementById('progress-list');
+  list.innerHTML = assignmentsData.map((a, i) => {
+    const pct = a.status === 'done' ? 100 : a.status === 'in progress' ? 50 : 0;
+    const color = colors[i % colors.length];
+    return `<div class="progress-item">
+      <div class="progress-item-header">
+        <span class="progress-item-name">${a.course} — ${a.assignment}</span>
+        <span class="progress-item-pct">${a.status}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:0.85rem;">No assignments added yet.</div>';
+}
+
+// ============================================================
+// API ACTIONS
+// ============================================================
+function updateStatus(assignmentName, status) {
+  fetch('/update_status', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({assignment: assignmentName, status})
+  }).then(() => showToast('Status updated!'));
+}
+
+function saveNote(assignmentName, idx) {
+  const note = document.getElementById(`note-${idx}`).value;
+  fetch('/save_note', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({assignment: assignmentName, note})
+  }).then(() => showToast('Note saved!'));
+}
+
+function deleteAssignment(assignmentName) {
+  if (!confirm(`Remove "${assignmentName}"?`)) return;
+  fetch('/delete_assignment', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({assignment: assignmentName})
+  }).then(() => location.reload());
+}
 </script>
-
-<body>
-    <h1>My Assignments</h1>
-
-    <form method="POST" action="/add">
-        <input type="text" name="course" placeholder="Course name" required>
-        <input type="text" name="assignment" placeholder="Assignment name" required>
-        <input type="date" name="due_date" placeholder="Due Date" required>
-        <input type="number" name="hours" placeholder="Estimated Hours" required>
-        <input type ="number" name="points" placeholder="=Point Value" required>
-        <input type="number" name="grade-weight" placeholder="% of course grade" required>
-        <input type="number" name="urgency" placeholder="Course importance (1 - 5)" min="1" max="5" required>
-        <button type="submit"> Add Assignments</button>
-    </form>
-
-    <h2>Priority Order:</h2>
-    <ol>
-        {% for score, assignment_name in pq %}
-        <li>
-            {{ assignment_name }} - Priority: {{ score|round(1) }}%
-            <br>
-            <input type="text" id="time-input-{{ loop.index }}" placeholder="30:00" style="width: 60px;">
-            <button onclick="startWorkTimer({{ loop.index }}, '{{ assignment_name }}')">Start</button>
-            <span id="timer-display-{{ loop.index }}" style="font-weight: bold;"></span>
-        </li>
-        {% endfor %}
-    </ol>
-
-    <h2>Current Assignments</h2>
-    <ul>
-        {% for assignment in assignments %}
-        <li>{{ assignment.course }} - {{ assignment.assignment }} - (Due: {{ assignment.due_date }} )</li>
-        {% endfor %}
-    </ul>
-
 </body>
 </html>
