@@ -5,6 +5,64 @@
 </head>
 
 
+<script>
+    let activeTimer = null;
+    let currentIndex = null;
+
+    function startWorkTimer(index, assignmentName) {
+        const input = document.getElementById(`time-input-${index}`).value;
+        const parts = input.split(':');
+
+        if (parts.length !== 2) {
+            alert('Enter time as MM:SS (e.g., 30:00)');
+            return;
+        }
+
+        const minutes = parseInt(parts[0]);
+        const seconds = parseInt(parts[1]);
+        const totalSeconds = (minutes * 60) + seconds;
+
+        runTimer(index, totalSeconds, 'work', assignmentName);
+    }
+
+    function startBreakTimer(index) {
+        runTimer(index, 300, 'break', null); // 5 minutes = 300 seconds
+    }
+
+    function runTimer(index, totalSeconds, type, assignmentName) {
+        if (activeTimer) {
+            clearInterval(activeTimer);
+        }
+
+        currentIndex = index;
+        let remaining = totalSeconds;
+        const display = document.getElementById(`timer-display-${index}`);
+
+        const label = type === 'work' ? 'Work' : 'Break';
+
+        activeTimer = setInterval(() => {
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+
+            display.textContent = `${label}: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+            if (remaining <= 0) {
+                clearInterval(activeTimer);
+
+                if (type === 'work') {
+                    display.textContent = 'Work done! Starting break...';
+                    setTimeout(() => startBreakTimer(index), 2000);
+                } else {
+                    display.textContent = 'Break over!';
+                    alert('Break finished! Ready to work again?');
+                }
+            }
+
+            remaining--;
+        }, 1000);
+    }
+</script>
+
 <body>
     <h1>My Assignments</h1>
 
@@ -13,9 +71,24 @@
         <input type="text" name="assignment" placeholder="Assignment name" required>
         <input type="date" name="due_date" placeholder="Due Date" required>
         <input type="number" name="hours" placeholder="Estimated Hours" required>
-        <input type="number" name="points" placeholder="Number of Points Worth" required>
+        <input type ="number" name="points" placeholder="=Point Value" required>
+        <input type="number" name="grade-weight" placeholder="% of course grade" required>
+        <input type="number" name="urgency" placeholder="Course importance (1 - 5)" min="1" max="5" required>
         <button type="submit"> Add Assignments</button>
     </form>
+
+    <h2>Priority Order:</h2>
+    <ol>
+        {% for score, assignment_name in pq %}
+        <li>
+            {{ assignment_name }} - Priority: {{ score|round(1) }}%
+            <br>
+            <input type="text" id="time-input-{{ loop.index }}" placeholder="30:00" style="width: 60px;">
+            <button onclick="startWorkTimer({{ loop.index }}, '{{ assignment_name }}')">Start</button>
+            <span id="timer-display-{{ loop.index }}" style="font-weight: bold;"></span>
+        </li>
+        {% endfor %}
+    </ol>
 
     <h2>Current Assignments</h2>
     <ul>
@@ -23,5 +96,6 @@
         <li>{{ assignment.course }} - {{ assignment.assignment }} - (Due: {{ assignment.due_date }} )</li>
         {% endfor %}
     </ul>
+
 </body>
 </html>
