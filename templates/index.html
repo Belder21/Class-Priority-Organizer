@@ -3,700 +3,851 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyDesk</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>StudyDesk Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f0f13;
-    --surface: #17171f;
-    --surface2: #1e1e28;
-    --border: #2a2a38;
-    --accent: rgba(15, 221, 221, 0.81);
-    --accent2: #fc6c9c;
-    --accent3: #6cfcb8;
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --warn: #fcb86c;
-    --danger: #fc6c6c;
+    --paper: #f8fbfd;
+    --paper-alt: #eef5f8;
+    --card: #ffffff;
+    --line: #c9dbe3;
+    --ink: #17324a;
+    --muted: #4e6a7e;
+    --blue: #2f6ea6;
+    --green: #2f8f73;
+    --green-soft: #dbeee7;
+    --danger: #b23d4a;
+    --warn: #9b6a28;
     --radius: 14px;
-    --font-display: 'Syne', sans-serif;
-    --font-mono: 'DM Mono', monospace;
+    --font-heading: "Libre Baskerville", serif;
+    --font-body: "Source Sans 3", sans-serif;
+    --font-mono: "Source Code Pro", monospace;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-display);
+    background: linear-gradient(180deg, var(--paper) 0%, #f3f9fc 100%);
+    color: var(--ink);
+    font-family: var(--font-body);
     min-height: 100vh;
-    background-image: radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124,108,252,0.12) 0%, transparent 60%),
-                      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(252,108,156,0.08) 0%, transparent 60%);
+    line-height: 1.45;
   }
 
-  /* ---- LAYOUT ---- */
-  .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-
-  /* ---- SIDEBAR ---- */
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 28px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
+  .page {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 30px 20px 40px;
   }
-  .logo {
-    font-size: 1.4rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .logo span { color: var(--accent); }
-  .nav-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-family: var(--font-display);
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-    width: 100%;
-  }
-  .nav-btn:hover { background: var(--surface2); color: var(--text); }
-  .nav-btn.active { background: rgba(124,108,252,0.15); color: var(--accent); }
-  .nav-btn .icon { font-size: 1.1rem; width: 20px; text-align: center; }
 
-  /* ---- MAIN ---- */
-  .main { padding: 32px 36px; }
-
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 28px;
-  }
-  .page-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; }
-  .page-title span { color: var(--accent); }
-
-  /* ---- TABS / SECTIONS ---- */
-  .section { display: none; }
-  .section.active { display: block; }
-
-  /* ---- CARDS ---- */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+  .header {
+    border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 22px 24px;
+    background: linear-gradient(120deg, #ffffff 0%, #f2f9ff 70%, #edf8f3 100%);
+    margin-bottom: 18px;
   }
-  .card-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
+  .header h1 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    margin-bottom: 6px;
+  }
+  .header h1 span { color: var(--blue); }
+  .header p { color: var(--muted); font-size: 0.98rem; }
+
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 14px;
   }
 
-  /* ---- ADD FORM ---- */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(23, 50, 74, 0.05);
   }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-  .field input, .field select {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    padding: 9px 12px;
-    outline: none;
-    transition: border-color 0.15s;
+  .card-title {
+    font-family: var(--font-heading);
+    font-size: 1.02rem;
+    margin-bottom: 12px;
+    color: var(--blue);
   }
-  .field input:focus, .field select:focus { border-color: var(--accent); }
-  .field select option { background: var(--surface2); }
+
+  .priority-card { grid-column: span 7; }
+  .form-card { grid-column: span 5; }
+  .calendar-card { grid-column: span 7; }
+  .pomo-card { grid-column: span 5; }
+  .progress-card { grid-column: span 12; }
+  .coach-card { grid-column: span 12; }
 
   .btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 7px;
-    padding: 10px 20px;
+    border: 1px solid transparent;
     border-radius: 9px;
-    border: none;
-    font-family: var(--font-display);
     font-size: 0.85rem;
     font-weight: 700;
+    font-family: var(--font-body);
+    padding: 9px 14px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: 0.15s ease;
   }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:hover { background: #537ee1; transform: translateY(-1px); }
-  .btn-sm { padding: 6px 13px; font-size: 0.78rem; }
-  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-danger { background: rgba(252,108,108,0.12); color: var(--danger); border: 1px solid rgba(252,108,108,0.2); }
-  .btn-danger:hover { background: rgba(252,108,108,0.25); }
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #285f8f; }
+  .btn-ghost {
+    background: var(--paper-alt);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+  .btn-danger {
+    background: #fff4f5;
+    border-color: #efc7cb;
+    color: var(--danger);
+  }
+  .btn-danger:hover { background: #ffecee; }
+  .btn-sm { padding: 6px 10px; font-size: 0.75rem; }
 
-  /* ---- PRIORITY LIST ---- */
   .priority-list { display: flex; flex-direction: column; gap: 10px; }
   .priority-item {
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-radius: 12px;
-    padding: 16px 18px;
+    padding: 12px;
+    background: #fbfdff;
     display: grid;
-    grid-template-columns: 32px 1fr auto;
-    gap: 14px;
+    grid-template-columns: 30px 1fr auto;
+    gap: 12px;
     align-items: start;
-    transition: border-color 0.15s;
   }
-  .priority-item:hover { border-color: rgba(124,108,252,0.4); }
   .rank-badge {
-    width: 32px; height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem;
     font-family: var(--font-mono);
-    flex-shrink: 0;
+    font-weight: 700;
+    color: var(--blue);
+    background: #e5f1ff;
   }
-  .rank-1 { background: rgba(252,184,108,0.2); color: var(--warn); }
-  .rank-2 { background: rgba(124,108,252,0.15); color: var(--accent); }
-  .rank-3 { background: rgba(108,252,184,0.12); color: var(--accent3); }
-  .rank-other { background: var(--surface); color: var(--muted); }
+  .rank-1 { background: #d9efe8; color: var(--green); }
+  .rank-2 { background: #e5f1ff; color: var(--blue); }
+  .rank-3 { background: #f0f7ff; color: #4b7ea8; }
+  .rank-other { background: #f2f5f8; color: var(--muted); }
 
-  .item-info { display: flex; flex-direction: column; gap: 5px; }
-  .item-name { font-size: 0.95rem; font-weight: 700; }
-  .item-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .item-name { font-weight: 700; font-size: 0.96rem; }
+  .item-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 5px; }
   .tag {
-    font-size: 0.68rem; font-weight: 600; padding: 2px 8px;
-    border-radius: 99px; font-family: var(--font-mono);
-  }
-  .tag-course { background: rgba(124,108,252,0.15); color: var(--accent); }
-  .tag-due { background: rgba(252,108,108,0.13); color: var(--danger); }
-  .tag-due-ok { background: rgba(108,252,184,0.12); color: var(--accent3); }
-  .tag-score { background: rgba(252,184,108,0.15); color: var(--warn); }
-
-  .priority-bar-wrap { margin-top: 6px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; width: 100%; }
-  .priority-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.6s ease; }
-
-  .item-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-
-  /* status select */
-  .status-select {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: var(--text);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 0.66rem;
+    font-weight: 700;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    padding: 4px 8px;
-    cursor: pointer;
-    outline: none;
+  }
+  .tag-course { background: #e6f1ff; color: var(--blue); }
+  .tag-due { background: #fff1f1; color: var(--danger); }
+  .tag-due-ok { background: var(--green-soft); color: var(--green); }
+  .tag-score { background: #edf6ff; color: #275a86; }
+
+  .priority-bar-wrap {
+    margin-top: 8px;
+    width: 100%;
+    height: 5px;
+    border-radius: 999px;
+    background: #deebf5;
+    overflow: hidden;
+  }
+  .priority-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--blue));
   }
 
-  /* Timer inline */
-  .timer-row { display: flex; align-items: center; gap: 7px; margin-top: 6px; flex-wrap: wrap; }
-  .timer-input {
-    width: 62px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: var(--text);
+  .timer-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .timer-input, .status-select, .field input, .field select, .note-area {
+    border: 1px solid var(--line);
+    border-radius: 8px;
     font-family: var(--font-mono);
     font-size: 0.8rem;
-    padding: 5px 8px;
+    color: var(--ink);
+    background: #fff;
     outline: none;
   }
-  .timer-input:focus { border-color: var(--accent); }
+  .timer-input {
+    width: 70px;
+    padding: 5px 7px;
+  }
+  .timer-input:focus, .status-select:focus, .field input:focus, .field select:focus, .note-area:focus {
+    border-color: var(--blue);
+  }
   .timer-display {
     font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--accent3);
-    min-width: 90px;
+    font-size: 0.76rem;
+    color: var(--green);
+    min-width: 96px;
+    font-weight: 600;
   }
 
-  /* Notes */
   .note-area {
     width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    padding: 8px 10px;
+    min-height: 54px;
     resize: vertical;
-    min-height: 56px;
-    outline: none;
-    margin-top: 6px;
-    transition: border-color 0.15s;
+    padding: 7px 9px;
+    margin-top: 8px;
   }
-  .note-area:focus { border-color: var(--accent); }
 
-  /* ---- CALENDAR ---- */
+  .item-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .status-select { padding: 5px 8px; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 26px 12px;
+  }
+  .empty-state .btn { margin-top: 10px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field label {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .field input, .field select { padding: 8px 9px; }
+
+  .cal-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .cal-nav-title {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-heading);
+    color: var(--blue);
+    font-size: 1rem;
+  }
   .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 4px;
   }
-  .cal-header { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--muted); padding: 6px 0; letter-spacing: 0.06em; }
+  .cal-header {
+    text-align: center;
+    font-size: 0.66rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    padding: 4px 0;
+  }
   .cal-day {
     min-height: 72px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 7px;
+    border: 1px solid #d8e6ef;
+    border-radius: 8px;
+    padding: 6px;
+    background: #fcfeff;
     font-size: 0.72rem;
     font-family: var(--font-mono);
-    position: relative;
   }
-  .cal-day.today { border-color: var(--accent); }
-  .cal-day.other-month { opacity: 0.35; }
-  .cal-day-num { font-weight: 500; color: var(--muted); margin-bottom: 4px; }
-  .cal-day.today .cal-day-num { color: var(--accent); font-weight: 800; }
+  .cal-day.today { border-color: var(--blue); background: #f0f7ff; }
+  .cal-day.other-month { opacity: 0.38; }
+  .cal-day-num { color: var(--muted); margin-bottom: 4px; }
   .cal-event {
-    background: rgba(124,108,252,0.25);
-    color: var(--accent);
     border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 0.62rem;
+    font-size: 0.61rem;
+    padding: 1px 4px;
     margin-bottom: 2px;
+    background: #e8f2ff;
+    color: var(--blue);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 600;
   }
-  .cal-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-  .cal-nav-title { font-size: 1.1rem; font-weight: 800; flex: 1; }
-  .month-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0 8px; }
 
-  /* ---- POMODORO (full) ---- */
   .pomo-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    padding: 10px 0;
+    gap: 14px;
   }
-  .pomo-ring-svg { position: relative; }
-  .pomo-ring-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
-  .pomo-ring-arc { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.3s; transform-origin: center; transform: rotate(-90deg); }
-  .pomo-time {
-    font-size: 2.4rem; font-weight: 800; font-family: var(--font-mono); letter-spacing: -0.03em; text-align: center;
+  .pomo-settings {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
-  .pomo-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
-  .pomo-controls { display: flex; gap: 10px; }
-  .pomo-sessions { display: flex; gap: 6px; }
-  .pomo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
-  .pomo-dot.done { background: var(--accent); }
-  .pomo-settings { display: flex; gap: 12px; margin-top: 4px; }
-  .pomo-setting { display: flex; flex-direction: column; gap: 4px; align-items: center; }
-  .pomo-setting label { font-size: 0.65rem; color: var(--muted); font-weight: 600; letter-spacing: 0.06em; }
+  .pomo-setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .pomo-setting label {
+    color: var(--muted);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
   .pomo-setting input {
-    width: 64px; text-align: center;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 7px; color: var(--text); font-family: var(--font-mono);
-    font-size: 0.85rem; padding: 6px 8px; outline: none;
+    width: 64px;
+    text-align: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    color: var(--ink);
+    padding: 6px 8px;
   }
+  .pomo-ring-bg { fill: none; stroke: #d8e7f2; stroke-width: 8; }
+  .pomo-ring-arc {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s;
+    transform-origin: center;
+    transform: rotate(-90deg);
+  }
+  .pomo-time {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  .pomo-label {
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    font-weight: 700;
+  }
+  .pomo-controls { display: flex; gap: 8px; }
+  .pomo-sessions { display: flex; gap: 6px; }
+  .pomo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #d3e1eb;
+  }
+  .pomo-dot.done { background: var(--green); }
 
-  /* ---- STATS ---- */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
   .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #fafcff;
   }
-  .stat-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-  .stat-value { font-size: 1.9rem; font-weight: 800; font-family: var(--font-mono); letter-spacing: -0.04em; }
-  .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+  .stat-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin-top: 5px;
+  }
+  .progress-list { display: flex; flex-direction: column; gap: 8px; }
+  .progress-item { display: flex; flex-direction: column; gap: 4px; }
+  .progress-item-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.84rem;
+  }
+  .progress-item-name { font-weight: 700; }
+  .progress-item-pct { color: var(--muted); font-family: var(--font-mono); }
+  .progress-track {
+    height: 6px;
+    background: #dce8f1;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
 
-  .progress-list { display: flex; flex-direction: column; gap: 10px; }
-  .progress-item { display: flex; flex-direction: column; gap: 5px; }
-  .progress-item-header { display: flex; justify-content: space-between; font-size: 0.82rem; }
-  .progress-item-name { font-weight: 600; }
-  .progress-item-pct { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
-  .progress-track { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+  .coach-top-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .coach-kpi {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #fbfeff;
+  }
+  .coach-kpi-label {
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .coach-kpi-value {
+    margin-top: 5px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--blue);
+  }
+  .coach-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .coach-item {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 11px;
+    background: #fcfeff;
+  }
+  .coach-item-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .coach-item-meta {
+    font-size: 0.74rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+  }
+  .coach-action {
+    font-size: 0.82rem;
+    color: var(--ink);
+  }
+  .coach-protocol {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px;
+    background: #fbfeff;
+    margin-bottom: 12px;
+  }
+  .coach-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 7px;
+    font-size: 0.84rem;
+  }
+  .coach-check input {
+    margin-top: 2px;
+  }
+  .coach-sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .source-link {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 0.68rem;
+    color: var(--blue);
+    text-decoration: none;
+    background: #f3f9ff;
+    font-weight: 700;
+  }
+  .source-link:hover {
+    border-color: var(--blue);
+    background: #e9f3ff;
+  }
 
-  /* ---- SCROLLBAR ---- */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-
-  /* ---- TOAST ---- */
   #toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--surface2); border: 1px solid var(--accent);
-    color: var(--text); font-size: 0.83rem; font-weight: 600;
-    padding: 10px 18px; border-radius: 10px;
-    opacity: 0; transform: translateY(8px);
-    transition: all 0.25s; pointer-events: none; z-index: 999;
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 9px 12px;
+    box-shadow: 0 5px 16px rgba(23, 50, 74, 0.1);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: 0.2s ease;
+    pointer-events: none;
   }
-  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-  @media (max-width: 800px) {
-    .shell { grid-template-columns: 1fr; }
-    .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; padding: 16px; }
-    .main { padding: 20px; }
+  @media (max-width: 1100px) {
+    .priority-card, .form-card, .calendar-card, .pomo-card { grid-column: span 12; }
   }
 </style>
 </head>
 <body>
-<div class="shell">
-  <!-- SIDEBAR -->
-  <nav class="sidebar">
-    <div class="logo">Study<span>Desk</span></div>
-    <button class="nav-btn active" onclick="showSection('dashboard')"><span class="icon">⚡</span> Dashboard</button>
-    <button class="nav-btn" onclick="showSection('add')"><span class="icon">＋</span> Add Assignment</button>
-    <button class="nav-btn" onclick="showSection('calendar')"><span class="icon">📅</span> Calendar</button>
-    <button class="nav-btn" onclick="showSection('pomodoro')"><span class="icon">🍅</span> Focus Timer</button>
-    <button class="nav-btn" onclick="showSection('progress')"><span class="icon">📊</span> Progress</button>
-  </nav>
+<div class="page">
+  <header class="header">
+    <h1>Study<span>Desk</span> Dashboard</h1>
+    <p>Single-view planning board for assignments, focus sessions, due dates, and completion tracking.</p>
+  </header>
 
-  <main class="main">
-
-    <!-- DASHBOARD -->
-    <section id="section-dashboard" class="section active">
-      <div class="page-header">
-        <div class="page-title">Priority <span>Queue</span></div>
-      </div>
-
+  <main class="dashboard">
+    <section class="card priority-card">
+      <h2 class="card-title">Priority Queue</h2>
       {% if pq %}
       <div class="priority-list">
         {% for score, assignment_name in pq %}
         {% set asgn = assignments | selectattr('assignment', 'equalto', assignment_name) | first %}
         {% set idx = loop.index %}
-        <div class="priority-item" id="item-{{ idx }}">
+        <div class="priority-item">
           <div class="rank-badge {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% else %}rank-other{% endif %}">
             #{{ loop.index }}
           </div>
-          <div class="item-info">
+
+          <div>
             <div class="item-name">{{ assignment_name }}</div>
             <div class="item-meta">
               {% if asgn %}
               <span class="tag tag-course">{{ asgn.course }}</span>
               {% set days_left = ((asgn.due_date | string) | days_from_today) %}
               <span class="tag {% if days_left <= 2 %}tag-due{% else %}tag-due-ok{% endif %}">Due {{ asgn.due_date }}</span>
-              {% if asgn.counts_for_major %}<span class="tag" style="background:rgba(108,252,184,0.1);color:var(--accent3);">Major</span>{% endif %}
-              {% if asgn.career_relevant %}<span class="tag" style="background:rgba(252,184,108,0.12);color:var(--warn);">Career</span>{% endif %}
+              {% if asgn.counts_for_major %}<span class="tag tag-due-ok">Major</span>{% endif %}
+              {% if asgn.career_relevant %}<span class="tag tag-score">Career</span>{% endif %}
               {% endif %}
               <span class="tag tag-score">{{ score | round(1) }}%</span>
             </div>
-            <div class="priority-bar-wrap"><div class="priority-bar" style="width:{{ score }}%"></div></div>
 
-            <!-- Timer row -->
+            <div class="priority-bar-wrap">
+              <div class="priority-bar" style="width:{{ score }}%"></div>
+            </div>
+
             <div class="timer-row">
               <input type="text" class="timer-input" id="time-input-{{ idx }}" placeholder="25:00">
-              <button class="btn btn-ghost btn-sm" onclick="startWorkTimer({{ idx }}, '{{ assignment_name }}')">▶ Start</button>
-              <button class="btn btn-sm" style="background:rgba(108,252,184,0.1);color:var(--accent3);border:1px solid rgba(108,252,184,0.2);" onclick="stopTimer()">■ Stop</button>
+              <button class="btn btn-ghost btn-sm" onclick="startWorkTimer({{ idx }}, '{{ assignment_name }}')">Start</button>
+              <button class="btn btn-ghost btn-sm" onclick="stopTimer()">Stop</button>
               <span class="timer-display" id="timer-display-{{ idx }}"></span>
             </div>
 
-            <!-- Notes -->
             <textarea class="note-area" id="note-{{ idx }}" placeholder="Add notes for this assignment..." onblur="saveNote('{{ assignment_name }}', {{ idx }})">{{ notes.get(assignment_name, '') }}</textarea>
           </div>
+
           <div class="item-actions">
             <select class="status-select" onchange="updateStatus('{{ assignment_name }}', this.value)">
               <option value="not started" {% if asgn and asgn.status == 'not started' %}selected{% endif %}>Not Started</option>
               <option value="in progress" {% if asgn and asgn.status == 'in progress' %}selected{% endif %}>In Progress</option>
-              <option value="done" {% if asgn and asgn.status == 'done' %}selected{% endif %}>Done ✓</option>
+              <option value="done" {% if asgn and asgn.status == 'done' %}selected{% endif %}>Done</option>
             </select>
-            <button class="btn btn-danger btn-sm" onclick="deleteAssignment('{{ assignment_name }}')">✕ Remove</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAssignment('{{ assignment_name }}')">Remove</button>
           </div>
         </div>
         {% endfor %}
       </div>
       {% else %}
-      <div class="card" style="text-align:center;padding:48px;color:var(--muted);">
-        <div style="font-size:2.5rem;margin-bottom:12px;">📚</div>
-        <div style="font-weight:700;margin-bottom:6px;">No assignments yet</div>
-        <div style="font-size:0.85rem;">Add your first assignment to get started</div>
-        <button class="btn btn-primary" style="margin-top:16px;" onclick="showSection('add')">+ Add Assignment</button>
+      <div class="empty-state">
+        <div>No assignments yet.</div>
+        <a href="#add-form"><button class="btn btn-primary">Add your first assignment</button></a>
       </div>
       {% endif %}
     </section>
 
-    <!-- ADD ASSIGNMENT -->
-    <section id="section-add" class="section">
-      <div class="page-header">
-        <div class="page-title">Add <span>Assignment</span></div>
-      </div>
-      <div class="card">
-        <form method="POST" action="/add">
-          <div class="form-grid">
-            <div class="field">
-              <label>Course Name</label>
-              <input type="text" name="course" placeholder="e.g. CS 3140" required>
-            </div>
-            <div class="field">
-              <label>Assignment Name</label>
-              <input type="text" name="assignment" placeholder="e.g. Project 2" required>
-            </div>
-            <div class="field">
-              <label>Due Date</label>
-              <input type="date" name="due_date" required>
-            </div>
-            <div class="field">
-              <label>Est. Hours</label>
-              <input type="number" name="hours" placeholder="3" min="0.5" step="0.5" required>
-            </div>
-            <div class="field">
-              <label>Point Value</label>
-              <input type="number" name="points" placeholder="100" required>
-            </div>
-            <div class="field">
-              <label>% of Course Grade</label>
-              <input type="number" name="grade_weight" placeholder="20" min="0" max="100" required>
-            </div>
-            <div class="field">
-              <label>Course Importance (1–5)</label>
-              <input type="number" name="course_importance" placeholder="3" min="1" max="5" required>
-            </div>
-            <div class="field">
-              <label>Credit Hours</label>
-              <input type="number" name="credits" placeholder="3" min="1" max="6" step="0.5" required>
-            </div>
-            <div class="field">
-              <label>Counts for Major?</label>
-              <select name="counts_for_major">
-                <option value="1">Yes</option>
-                <option value="0">No</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Career Relevant?</label>
-              <select name="career_relevance">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-            </div>
+    <section class="card form-card" id="add-form">
+      <h2 class="card-title">Add Assignment</h2>
+      <form method="POST" action="/add">
+        <div class="form-grid">
+          <div class="field">
+            <label>Course Name</label>
+            <input type="text" name="course" placeholder="e.g. CS 3140" required>
           </div>
-          <button type="submit" class="btn btn-primary">＋ Add Assignment</button>
-        </form>
-      </div>
+          <div class="field">
+            <label>Assignment Name</label>
+            <input type="text" name="assignment" placeholder="e.g. Project 2" required>
+          </div>
+          <div class="field">
+            <label>Due Date</label>
+            <input type="date" name="due_date" required>
+          </div>
+          <div class="field">
+            <label>Est. Hours</label>
+            <input type="number" name="hours" placeholder="3" min="0.5" step="0.5" required>
+          </div>
+          <div class="field">
+            <label>Point Value</label>
+            <input type="number" name="points" placeholder="100" required>
+          </div>
+          <div class="field">
+            <label>% of Course Grade</label>
+            <input type="number" name="grade_weight" placeholder="20" min="0" max="100" required>
+          </div>
+          <div class="field">
+            <label>Course Importance (1-5)</label>
+            <input type="number" name="course_importance" placeholder="3" min="1" max="5" required>
+          </div>
+          <div class="field">
+            <label>Counts for Major?</label>
+            <select name="counts_for_major">
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Assignment</button>
+      </form>
     </section>
 
-    <!-- CALENDAR -->
-    <section id="section-calendar" class="section">
-      <div class="page-header">
-        <div class="page-title">Due Date <span>Calendar</span></div>
+    <section class="card calendar-card">
+      <h2 class="card-title">Due Date Calendar</h2>
+      <div class="cal-nav">
+        <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">Prev</button>
+        <div class="cal-nav-title" id="cal-title"></div>
+        <button class="btn btn-ghost btn-sm" onclick="calNav(1)">Next</button>
       </div>
-      <div class="card">
-        <div class="cal-nav">
-          <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">← Prev</button>
-          <div class="cal-nav-title" id="cal-title"></div>
-          <button class="btn btn-ghost btn-sm" onclick="calNav(1)">Next →</button>
-        </div>
-        <div class="calendar-grid" id="cal-days-header">
-          <div class="cal-header">SUN</div>
-          <div class="cal-header">MON</div>
-          <div class="cal-header">TUE</div>
-          <div class="cal-header">WED</div>
-          <div class="cal-header">THU</div>
-          <div class="cal-header">FRI</div>
-          <div class="cal-header">SAT</div>
-        </div>
-        <div class="calendar-grid" id="cal-grid"></div>
+      <div class="calendar-grid" id="cal-days-header">
+        <div class="cal-header">SUN</div>
+        <div class="cal-header">MON</div>
+        <div class="cal-header">TUE</div>
+        <div class="cal-header">WED</div>
+        <div class="cal-header">THU</div>
+        <div class="cal-header">FRI</div>
+        <div class="cal-header">SAT</div>
       </div>
+      <div class="calendar-grid" id="cal-grid"></div>
     </section>
 
-    <!-- POMODORO -->
-    <section id="section-pomodoro" class="section">
-      <div class="page-header">
-        <div class="page-title">Focus <span>Timer</span></div>
-      </div>
-      <div class="card">
-        <div class="pomo-wrap">
-          <div class="pomo-settings">
-            <div class="pomo-setting">
-              <label>WORK (min)</label>
-              <input type="number" id="pomo-work-min" value="25" min="1" max="90">
-            </div>
-            <div class="pomo-setting">
-              <label>SHORT BREAK</label>
-              <input type="number" id="pomo-break-min" value="5" min="1" max="30">
-            </div>
-            <div class="pomo-setting">
-              <label>LONG BREAK</label>
-              <input type="number" id="pomo-long-min" value="15" min="1" max="60">
-            </div>
+    <section class="card pomo-card">
+      <h2 class="card-title">Focus Timer</h2>
+      <div class="pomo-wrap">
+        <div class="pomo-settings">
+          <div class="pomo-setting">
+            <label>WORK (min)</label>
+            <input type="number" id="pomo-work-min" value="25" min="1" max="90">
           </div>
+          <div class="pomo-setting">
+            <label>SHORT BREAK</label>
+            <input type="number" id="pomo-break-min" value="5" min="1" max="30">
+          </div>
+          <div class="pomo-setting">
+            <label>LONG BREAK</label>
+            <input type="number" id="pomo-long-min" value="15" min="1" max="60">
+          </div>
+        </div>
 
-          <svg class="pomo-ring-svg" width="180" height="180" viewBox="0 0 180 180">
-            <circle class="pomo-ring-bg" cx="90" cy="90" r="80"/>
-            <circle class="pomo-ring-arc" id="pomo-arc" cx="90" cy="90" r="80"
-              stroke-dasharray="502.65" stroke-dashoffset="0"/>
-          </svg>
-          <div style="margin-top:-140px; margin-bottom: 100px; text-align:center; pointer-events:none;">
-            <div class="pomo-time" id="pomo-display">25:00</div>
-            <div class="pomo-label" id="pomo-phase-label">WORK SESSION</div>
-          </div>
+        <svg width="170" height="170" viewBox="0 0 180 180">
+          <circle class="pomo-ring-bg" cx="90" cy="90" r="80"></circle>
+          <circle class="pomo-ring-arc" id="pomo-arc" cx="90" cy="90" r="80" stroke-dasharray="502.65" stroke-dashoffset="0"></circle>
+        </svg>
+        <div style="margin-top:-134px; margin-bottom: 88px; text-align:center; pointer-events:none;">
+          <div class="pomo-time" id="pomo-display">25:00</div>
+          <div class="pomo-label" id="pomo-phase-label">WORK SESSION</div>
+        </div>
 
-          <div class="pomo-sessions" id="pomo-dots">
-            <div class="pomo-dot"></div>
-            <div class="pomo-dot"></div>
-            <div class="pomo-dot"></div>
-            <div class="pomo-dot"></div>
-          </div>
+        <div class="pomo-sessions">
+          <div class="pomo-dot"></div>
+          <div class="pomo-dot"></div>
+          <div class="pomo-dot"></div>
+          <div class="pomo-dot"></div>
+        </div>
 
-          <div class="pomo-controls">
-            <button class="btn btn-primary" id="pomo-start-btn" onclick="pomoToggle()">▶ Start</button>
-            <button class="btn btn-ghost" onclick="pomoReset()">↺ Reset</button>
-          </div>
+        <div class="pomo-controls">
+          <button class="btn btn-primary" id="pomo-start-btn" onclick="pomoToggle()">Start</button>
+          <button class="btn btn-ghost" onclick="pomoReset()">Reset</button>
         </div>
       </div>
     </section>
 
-    <!-- PROGRESS -->
-    <section id="section-progress" class="section">
-      <div class="page-header">
-        <div class="page-title">Progress <span>Tracking</span></div>
-      </div>
+    <section class="card progress-card">
+      <h2 class="card-title">Progress Tracking</h2>
       <div class="stats-grid" id="stats-grid"></div>
-      <div class="card">
-        <div class="card-title">Assignment Progress</div>
-        <div class="progress-list" id="progress-list"></div>
-      </div>
+      <div class="progress-list" id="progress-list"></div>
     </section>
 
+    <section class="card coach-card">
+      <h2 class="card-title">Evidence-Based Study Coach</h2>
+
+      <div class="coach-top-grid">
+        <div class="coach-kpi">
+          <div class="coach-kpi-label">Daily Focus Target</div>
+          <div class="coach-kpi-value">{{ study_coach.daily_minutes_target }} min</div>
+        </div>
+        <div class="coach-kpi">
+          <div class="coach-kpi-label">Top Priority Actions Today</div>
+          <div class="coach-kpi-value">{{ study_coach.top_actions | length }}</div>
+        </div>
+      </div>
+
+      <div class="coach-list">
+        {% if study_coach.top_actions %}
+        {% for item in study_coach.top_actions %}
+        <div class="coach-item">
+          <div class="coach-item-title">{{ item.course }} - {{ item.assignment }}</div>
+          <div class="coach-item-meta">Due {{ item.due_date }} | {{ item.urgency }} urgency | {{ item.focus_blocks }} focus blocks</div>
+          <div class="coach-action">{{ item.next_action }}</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="coach-item">
+          <div class="coach-action">No pending assignments. Add work to generate a personalized study protocol.</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="coach-list">
+        {% for item in study_coach.assignment_plans %}
+        <div class="coach-item">
+          <div class="coach-item-title">{{ item.assignment }}</div>
+          <div class="coach-item-meta">
+            Retrieval rounds: {{ item.retrieval_rounds }} | Spaced reviews:
+            {% if item.spaced_dates %}
+              {{ item.spaced_dates | join(", ") }}
+            {% else %}
+              No spaced dates available
+            {% endif %}
+          </div>
+          <div class="coach-action">{{ item.interleave_hint }}</div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="coach-protocol">
+        {% for rule in study_coach.weekly_protocol %}
+        <label class="coach-check">
+          <input type="checkbox" class="coach-checkbox" data-protocol-id="{{ rule.id }}">
+          <span>{{ rule.label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div class="coach-sources">
+        {% for src in research_sources %}
+        <a class="source-link" href="{{ src.url }}" target="_blank" rel="noopener noreferrer">{{ src.title }}</a>
+        {% endfor %}
+      </div>
+    </section>
   </main>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ============================================================
-// DATA FROM FLASK
-// ============================================================
 const calendarEvents = {{ calendar_events | safe }};
 const assignmentsData = {{ assignments | tojson | safe }};
 
-// ============================================================
-// NAVIGATION
-// ============================================================
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('section-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
-
-  if (id === 'calendar') renderCalendar();
-  if (id === 'progress') renderProgress();
-}
-
-// ============================================================
-// TOAST
-// ============================================================
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  const t = document.getElementById("toast");
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
 }
 
-// ============================================================
-// WORK TIMER (inline per-assignment)
-// ============================================================
 let activeTimer = null;
-
-function startWorkTimer(index, assignmentName) {
-  const input = document.getElementById(`time-input-${index}`).value || '25:00';
-  const parts = input.split(':');
-  if (parts.length !== 2) { alert('Use MM:SS format'); return; }
-  const totalSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-  runTimer(index, totalSeconds, 'work', assignmentName);
+function startWorkTimer(index) {
+  const input = document.getElementById(`time-input-${index}`).value || "25:00";
+  const parts = input.split(":");
+  if (parts.length !== 2) { alert("Use MM:SS format"); return; }
+  const totalSeconds = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+  runTimer(index, totalSeconds, "work");
 }
-
 function startBreakTimer(index) {
-  runTimer(index, 300, 'break', null);
+  runTimer(index, 300, "break");
 }
-
 function stopTimer() {
   if (activeTimer) { clearInterval(activeTimer); activeTimer = null; }
 }
-
-function runTimer(index, totalSeconds, type, assignmentName) {
+function runTimer(index, totalSeconds, type) {
   if (activeTimer) clearInterval(activeTimer);
   let remaining = totalSeconds;
   const display = document.getElementById(`timer-display-${index}`);
-  const label = type === 'work' ? '🍅' : '☕';
-
+  const label = type === "work" ? "WORK" : "BREAK";
   activeTimer = setInterval(() => {
     const m = Math.floor(remaining / 60);
     const s = remaining % 60;
-    display.textContent = `${label} ${m}:${s < 10 ? '0' : ''}${s}`;
-
+    display.textContent = `${label} ${m}:${s < 10 ? "0" : ""}${s}`;
     if (remaining <= 0) {
       clearInterval(activeTimer);
-      if (type === 'work') {
-        display.textContent = '✓ Done! Break starting…';
-        setTimeout(() => startBreakTimer(index), 2000);
+      if (type === "work") {
+        display.textContent = "Done. Break starts...";
+        setTimeout(() => startBreakTimer(index), 1600);
       } else {
-        display.textContent = '☕ Break over!';
-        showToast('Break finished! Time to get back to it.');
+        display.textContent = "Break complete.";
+        showToast("Break finished.");
       }
     }
     remaining--;
   }, 1000);
 }
 
-// ============================================================
-// POMODORO
-// ============================================================
 let pomoInterval = null;
 let pomoRunning = false;
-let pomoPhase = 'work'; // work | break | long
+let pomoPhase = "work";
 let pomoSession = 0;
 let pomoRemaining = 0;
-const circumference = 2 * Math.PI * 80; // 502.65
+const circumference = 2 * Math.PI * 80;
 
-function pomoGetWork()  { return (parseInt(document.getElementById('pomo-work-min').value) || 25) * 60; }
-function pomoGetBreak() { return (parseInt(document.getElementById('pomo-break-min').value) || 5) * 60; }
-function pomoGetLong()  { return (parseInt(document.getElementById('pomo-long-min').value) || 15) * 60; }
+function pomoGetWork()  { return (parseInt(document.getElementById("pomo-work-min").value, 10) || 25) * 60; }
+function pomoGetBreak() { return (parseInt(document.getElementById("pomo-break-min").value, 10) || 5) * 60; }
+function pomoGetLong()  { return (parseInt(document.getElementById("pomo-long-min").value, 10) || 15) * 60; }
 
 function pomoReset() {
   if (pomoInterval) clearInterval(pomoInterval);
-  pomoRunning = false; pomoPhase = 'work'; pomoSession = 0;
+  pomoRunning = false;
+  pomoPhase = "work";
+  pomoSession = 0;
   pomoRemaining = pomoGetWork();
   updatePomoDisplay(pomoRemaining, pomoGetWork());
-  document.getElementById('pomo-phase-label').textContent = 'WORK SESSION';
-  document.getElementById('pomo-start-btn').textContent = '▶ Start';
-  document.querySelectorAll('.pomo-dot').forEach(d => d.classList.remove('done'));
+  document.getElementById("pomo-phase-label").textContent = "WORK SESSION";
+  document.getElementById("pomo-start-btn").textContent = "Start";
+  document.querySelectorAll(".pomo-dot").forEach(d => d.classList.remove("done"));
+  document.getElementById("pomo-arc").style.stroke = "var(--blue)";
 }
 
 function pomoToggle() {
   if (pomoRunning) {
     clearInterval(pomoInterval);
     pomoRunning = false;
-    document.getElementById('pomo-start-btn').textContent = '▶ Resume';
+    document.getElementById("pomo-start-btn").textContent = "Resume";
   } else {
     if (pomoRemaining === 0) {
       pomoRemaining = pomoGetWork();
-      pomoPhase = 'work';
+      pomoPhase = "work";
     }
     pomoRunning = true;
-    document.getElementById('pomo-start-btn').textContent = '⏸ Pause';
-    const totalForPhase = pomoPhase === 'work' ? pomoGetWork() : pomoPhase === 'long' ? pomoGetLong() : pomoGetBreak();
+    document.getElementById("pomo-start-btn").textContent = "Pause";
+    const totalForPhase = pomoPhase === "work" ? pomoGetWork() : (pomoPhase === "long" ? pomoGetLong() : pomoGetBreak());
     pomoInterval = setInterval(() => pomoTick(totalForPhase), 1000);
   }
 }
@@ -705,25 +856,25 @@ function pomoTick(total) {
   if (pomoRemaining <= 0) {
     clearInterval(pomoInterval);
     pomoRunning = false;
-    if (pomoPhase === 'work') {
+    if (pomoPhase === "work") {
       pomoSession++;
       updatePomoDots();
       const isLong = pomoSession % 4 === 0;
-      pomoPhase = isLong ? 'long' : 'break';
+      pomoPhase = isLong ? "long" : "break";
       pomoRemaining = isLong ? pomoGetLong() : pomoGetBreak();
-      document.getElementById('pomo-phase-label').textContent = isLong ? 'LONG BREAK' : 'SHORT BREAK';
-      showToast(isLong ? '🎉 Long break time!' : '☕ Short break time!');
-      document.getElementById('pomo-arc').style.stroke = 'var(--accent3)';
+      document.getElementById("pomo-phase-label").textContent = isLong ? "LONG BREAK" : "SHORT BREAK";
+      showToast(isLong ? "Long break time." : "Short break time.");
+      document.getElementById("pomo-arc").style.stroke = "var(--green)";
     } else {
-      pomoPhase = 'work';
+      pomoPhase = "work";
       pomoRemaining = pomoGetWork();
-      document.getElementById('pomo-phase-label').textContent = 'WORK SESSION';
-      showToast('🍅 Break over — back to work!');
-      document.getElementById('pomo-arc').style.stroke = 'var(--accent)';
+      document.getElementById("pomo-phase-label").textContent = "WORK SESSION";
+      showToast("Break over. Back to work.");
+      document.getElementById("pomo-arc").style.stroke = "var(--blue)";
     }
-    const newTotal = pomoPhase === 'work' ? pomoGetWork() : pomoPhase === 'long' ? pomoGetLong() : pomoGetBreak();
-    updatePomoDisplay(pomoRemaining, newTotal);
-    document.getElementById('pomo-start-btn').textContent = '▶ Start';
+    const nextTotal = pomoPhase === "work" ? pomoGetWork() : (pomoPhase === "long" ? pomoGetLong() : pomoGetBreak());
+    updatePomoDisplay(pomoRemaining, nextTotal);
+    document.getElementById("pomo-start-btn").textContent = "Start";
     return;
   }
   pomoRemaining--;
@@ -733,134 +884,162 @@ function pomoTick(total) {
 function updatePomoDisplay(remaining, total) {
   const m = Math.floor(remaining / 60);
   const s = remaining % 60;
-  document.getElementById('pomo-display').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+  document.getElementById("pomo-display").textContent = `${m}:${s < 10 ? "0" : ""}${s}`;
   const offset = circumference * (1 - remaining / total);
-  document.getElementById('pomo-arc').style.strokeDashoffset = offset;
+  document.getElementById("pomo-arc").style.strokeDashoffset = offset;
 }
 
 function updatePomoDots() {
-  const dots = document.querySelectorAll('.pomo-dot');
-  dots.forEach((d, i) => { if (i < pomoSession % 4 || (pomoSession % 4 === 0 && pomoSession > 0)) d.classList.add('done'); });
-  if (pomoSession % 4 === 0 && pomoSession > 0) dots.forEach(d => setTimeout(() => d.classList.remove('done'), 500));
+  const dots = document.querySelectorAll(".pomo-dot");
+  dots.forEach((d, i) => {
+    if (i < (pomoSession % 4) || (pomoSession % 4 === 0 && pomoSession > 0)) d.classList.add("done");
+  });
+  if (pomoSession % 4 === 0 && pomoSession > 0) {
+    dots.forEach(d => setTimeout(() => d.classList.remove("done"), 450));
+  }
 }
 
-// init pomo
-window.addEventListener('DOMContentLoaded', () => {
-  pomoRemaining = pomoGetWork();
-  updatePomoDisplay(pomoRemaining, pomoGetWork());
-});
+let calYear;
+let calMonth;
+(function() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+})();
 
-// ============================================================
-// CALENDAR
-// ============================================================
-let calYear, calMonth;
-(function() { const n = new Date(); calYear = n.getFullYear(); calMonth = n.getMonth(); })();
-
-function calNav(dir) { calMonth += dir; if (calMonth > 11) { calMonth = 0; calYear++; } if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function calNav(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
 
 function renderCalendar() {
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('cal-title').textContent = `${monthNames[calMonth]} ${calYear}`;
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById("cal-title").textContent = `${monthNames[calMonth]} ${calYear}`;
 
   const today = new Date();
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const prevDays = new Date(calYear, calMonth, 0).getDate();
 
-  const grid = document.getElementById('cal-grid');
-  grid.innerHTML = '';
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
 
-  // Map events to date strings
   const eventMap = {};
-  calendarEvents.forEach(ev => { if (!eventMap[ev.date]) eventMap[ev.date] = []; eventMap[ev.date].push(ev); });
+  calendarEvents.forEach(ev => {
+    if (!eventMap[ev.date]) eventMap[ev.date] = [];
+    eventMap[ev.date].push(ev);
+  });
 
-  // Prev month padding
   for (let i = 0; i < firstDay; i++) {
-    const d = document.createElement('div');
-    d.className = 'cal-day other-month';
+    const d = document.createElement("div");
+    d.className = "cal-day other-month";
     d.innerHTML = `<div class="cal-day-num">${prevDays - firstDay + 1 + i}</div>`;
     grid.appendChild(d);
   }
 
   for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-    const div = document.createElement('div');
-    div.className = 'cal-day' + (isToday ? ' today' : '');
+    const day = document.createElement("div");
+    day.className = `cal-day${isToday ? " today" : ""}`;
     let html = `<div class="cal-day-num">${d}</div>`;
     if (eventMap[dateStr]) {
-      eventMap[dateStr].forEach(ev => { html += `<div class="cal-event" title="${ev.title}">${ev.title}</div>`; });
+      eventMap[dateStr].forEach(ev => {
+        html += `<div class="cal-event" title="${ev.title}">${ev.title}</div>`;
+      });
     }
-    div.innerHTML = html;
-    grid.appendChild(div);
+    day.innerHTML = html;
+    grid.appendChild(day);
   }
 
-  // Fill remaining
   const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
   for (let i = 1; i <= totalCells - firstDay - daysInMonth; i++) {
-    const d = document.createElement('div');
-    d.className = 'cal-day other-month';
+    const d = document.createElement("div");
+    d.className = "cal-day other-month";
     d.innerHTML = `<div class="cal-day-num">${i}</div>`;
     grid.appendChild(d);
   }
 }
 
-// ============================================================
-// PROGRESS
-// ============================================================
 function renderProgress() {
   const total = assignmentsData.length;
-  const done = assignmentsData.filter(a => a.status === 'done').length;
-  const inProgress = assignmentsData.filter(a => a.status === 'in progress').length;
+  const done = assignmentsData.filter(a => a.status === "done").length;
+  const inProgress = assignmentsData.filter(a => a.status === "in progress").length;
   const pct = total ? Math.round((done / total) * 100) : 0;
 
-  const statsGrid = document.getElementById('stats-grid');
+  const statsGrid = document.getElementById("stats-grid");
   statsGrid.innerHTML = `
     <div class="stat-card"><div class="stat-label">Total Assignments</div><div class="stat-value">${total}</div></div>
-    <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" style="color:var(--accent3)">${done}</div></div>
+    <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" style="color:var(--green)">${done}</div></div>
     <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value" style="color:var(--warn)">${inProgress}</div></div>
-    <div class="stat-card"><div class="stat-label">Completion Rate</div><div class="stat-value" style="color:var(--accent)">${pct}%</div></div>
+    <div class="stat-card"><div class="stat-label">Completion Rate</div><div class="stat-value" style="color:var(--blue)">${pct}%</div></div>
   `;
 
-  const colors = ['var(--accent)', 'var(--accent2)', 'var(--accent3)', 'var(--warn)'];
-  const list = document.getElementById('progress-list');
+  const colors = ["var(--blue)", "var(--green)", "#4179a6", "#5e8fb8"];
+  const list = document.getElementById("progress-list");
   list.innerHTML = assignmentsData.map((a, i) => {
-    const pct = a.status === 'done' ? 100 : a.status === 'in progress' ? 50 : 0;
+    const percent = a.status === "done" ? 100 : (a.status === "in progress" ? 50 : 0);
     const color = colors[i % colors.length];
     return `<div class="progress-item">
       <div class="progress-item-header">
-        <span class="progress-item-name">${a.course} — ${a.assignment}</span>
+        <span class="progress-item-name">${a.course} - ${a.assignment}</span>
         <span class="progress-item-pct">${a.status}</span>
       </div>
-      <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${percent}%;background:${color}"></div></div>
     </div>`;
-  }).join('') || '<div style="color:var(--muted);font-size:0.85rem;">No assignments added yet.</div>';
+  }).join("") || '<div style="color:var(--muted);font-size:0.85rem;">No assignments added yet.</div>';
 }
 
-// ============================================================
-// API ACTIONS
-// ============================================================
 function updateStatus(assignmentName, status) {
-  fetch('/update_status', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({assignment: assignmentName, status})
-  }).then(() => showToast('Status updated!'));
+  fetch("/update_status", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({assignment: assignmentName, status: status})
+  }).then(() => {
+    const asgn = assignmentsData.find(a => a.assignment === assignmentName);
+    if (asgn) asgn.status = status;
+    renderProgress();
+    showToast("Status updated.");
+  });
 }
 
 function saveNote(assignmentName, idx) {
   const note = document.getElementById(`note-${idx}`).value;
-  fetch('/save_note', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({assignment: assignmentName, note})
-  }).then(() => showToast('Note saved!'));
+  fetch("/save_note", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({assignment: assignmentName, note: note})
+  }).then(() => showToast("Note saved."));
 }
 
 function deleteAssignment(assignmentName) {
   if (!confirm(`Remove "${assignmentName}"?`)) return;
-  fetch('/delete_assignment', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+  fetch("/delete_assignment", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify({assignment: assignmentName})
   }).then(() => location.reload());
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  renderCalendar();
+  renderProgress();
+  pomoRemaining = pomoGetWork();
+  updatePomoDisplay(pomoRemaining, pomoGetWork());
+  loadProtocolChecklist();
+});
+
+function loadProtocolChecklist() {
+  document.querySelectorAll(".coach-checkbox").forEach((cb) => {
+    const key = `study-coach-${cb.dataset.protocolId}`;
+    cb.checked = localStorage.getItem(key) === "1";
+    cb.addEventListener("change", () => {
+      localStorage.setItem(key, cb.checked ? "1" : "0");
+      showToast(cb.checked ? "Checklist item completed." : "Checklist item unchecked.");
+    });
+  });
 }
 </script>
 </body>
