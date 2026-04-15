@@ -1,0 +1,23 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Local user data (only exists locally)
+data/
+
+# Google OAuth credentials file — DO NOT commit this!
+client_secret_*.json
+
+# IDE
+.idea/
+.vscode/
+
+# Environment variables
+.env
+.env.local

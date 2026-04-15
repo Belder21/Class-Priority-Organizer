@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="rainforest">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Videos — {{ assignment_name or 'Search' }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&family=Lato:wght@300;400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+[data-theme="rainforest"] {
+  --paper:       #f0f7f2;
+  --paper-alt:   #e2f0e7;
+  --card:        #ffffff;
+  --line:        #b5d9bc;
+  --ink:         #1a3a2a;
+  --muted:       #4d7a5d;
+  --accent:      #2d7d52;
+  --accent-soft: #d5eedd;
+  --accent2:     #5ba88a;
+  --danger:      #b23d4a;
+  --radius:      14px;
+  --font-heading: "Libre Baskerville", serif;
+  --font-body:    "Source Sans 3", sans-serif;
+  --font-mono:    "Source Code Pro", monospace;
+  --bg:          linear-gradient(160deg, #eef7f0 0%, #f0f7f2 50%, #e8f4ec 100%);
+}
+[data-theme="dark-academia"] {
+  --paper:       #1c1814;
+  --paper-alt:   #242019;
+  --card:        #2a2420;
+  --line:        #4a4030;
+  --ink:         #e8dfc8;
+  --muted:       #a89878;
+  --accent:      #c9a84c;
+  --accent-soft: #3a3020;
+  --accent2:     #8b7355;
+  --danger:      #e57373;
+  --radius:      14px;
+  --font-heading: "Playfair Display", serif;
+  --font-body:    "Lato", sans-serif;
+  --font-mono:    "Source Code Pro", monospace;
+  --bg:          linear-gradient(160deg, #1a1610 0%, #1c1814 50%, #181410 100%);
+}
+[data-theme="retro"] {
+  --paper:       #080818;
+  --paper-alt:   #10102a;
+  --card:        #14143a;
+  --line:        #2a2a60;
+  --ink:         #e0e8ff;
+  --muted:       #7878b0;
+  --accent:      #00ff88;
+  --accent-soft: #002a18;
+  --accent2:     #ff44ff;
+  --danger:      #ff4455;
+  --radius:      4px;
+  --font-heading: "Press Start 2P", cursive;
+  --font-body:    "VT323", monospace;
+  --font-mono:    "VT323", monospace;
+  --bg:          radial-gradient(ellipse at top, #1a0a3a 0%, #080818 60%);
+}
+[data-theme="retro"] body { font-size: 1.1rem; }
+[data-theme="retro"] .page-header h1 { font-size: 0.75rem; line-height: 1.8; }
+[data-theme="retro"] .section-title { font-size: 0.6rem; letter-spacing: 0.06em; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+.page { max-width: 860px; margin: 0 auto; padding: 28px 18px 60px; }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.back-link:hover { text-decoration: underline; }
+
+.page-header {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.page-header h1 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.page-header .sub {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.description-box {
+  margin-top: 12px;
+  background: var(--paper-alt);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.88rem;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+.description-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.search-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.query-list { display: flex; flex-direction: column; gap: 10px; }
+.query-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper-alt);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 14px;
+}
+.query-text {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--ink);
+  font-style: italic;
+}
+.query-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ff0000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  padding: 7px 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.15s;
+  white-space: nowrap;
+}
+.query-btn:hover { background: #cc0000; }
+.yt-icon { width: 16px; height: 16px; fill: #fff; }
+
+.custom-search-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.search-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.search-input {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--ink);
+  background: var(--paper-alt);
+  outline: none;
+}
+.search-input:focus { border-color: var(--accent); }
+.btn-yt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ff0000;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.btn-yt:hover { background: #cc0000; }
+
+.tip-box {
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.tip-box strong { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="page">
+  <a href="/" class="back-link">&#8592; Back to StudyDesk</a>
+
+  <div class="page-header">
+    <h1>Study Videos{% if assignment_name %}: {{ assignment_name }}{% endif %}</h1>
+    {% if course %}
+    <div class="sub">{{ course }}</div>
+    {% endif %}
+    {% if description %}
+    <div class="description-label" style="margin-top:10px;">Your Description</div>
+    <div class="description-box">{{ description }}</div>
+    {% endif %}
+  </div>
+
+  {% if queries %}
+  <div class="search-card">
+    <div class="section-title">Suggested YouTube Searches</div>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:12px;">
+      Each button opens a YouTube search in a new tab — completely free, no account needed.
+    </p>
+    <div class="query-list">
+      {% for q in queries %}
+      <div class="query-item">
+        <span class="query-text">"{{ q }}"</span>
+        <a class="query-btn"
+           href="https://www.youtube.com/results?search_query={{ q | urlencode }}"
+           target="_blank" rel="noopener">
+          <svg class="yt-icon" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+          Search on YouTube
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Custom search -->
+  <div class="custom-search-card">
+    <div class="section-title">Custom Search</div>
+    <div class="search-row">
+      <input type="text" class="search-input" id="custom-q"
+             placeholder="Type any topic to search on YouTube…"
+             value="{{ description[:80] if description else '' }}"
+             onkeydown="if(event.key==='Enter') openCustomSearch()">
+      <button class="btn-yt" onclick="openCustomSearch()">
+        <svg style="width:16px;height:16px;fill:#fff" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+        Search YouTube
+      </button>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Study tip:</strong> Search for concept explanations, not just assignment names.
+    Try phrases like <em>"[topic] explained simply"</em>, <em>"[concept] tutorial for beginners"</em>,
+    or <em>"[topic] step by step"</em> to find the most helpful videos.
+  </div>
+</div>
+
+<script>
+function openCustomSearch() {
+  const q = document.getElementById('custom-q').value.trim();
+  if (!q) return;
+  window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(q), '_blank');
+}
+
+// Restore the theme the user selected on the main page
+const saved = localStorage.getItem('studydesk-theme');
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+</script>
+</body>
+</html>

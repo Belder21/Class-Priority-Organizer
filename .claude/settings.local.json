@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python.exe -c ':*)",
+      "Bash(pip list:*)",
+      "Bash(python -c \"import flask; print\\('flask ok'\\)\")",
+      "Bash(python -c \"import google_auth_oauthlib; print\\('google_auth_oauthlib ok'\\)\")",
+      "Bash(python -c \"import googleapiclient; print\\('googleapiclient ok'\\)\")",
+      "Bash(python3 -c \"import flask; print\\('flask ok'\\)\")",
+      "Bash(python3 -c \"import google_auth_oauthlib; print\\('google_auth_oauthlib ok'\\)\")",
+      "Bash(python3 -c \"import googleapiclient; print\\('googleapiclient ok'\\)\")",
+      "Bash(py -3 -c \"import flask; print\\('flask ok'\\)\")",
+      "Bash(py -3 -c \"import google_auth_oauthlib; print\\('google_auth_oauthlib ok'\\)\")",
+      "Bash(py -3 -c \"import googleapiclient; print\\('googleapiclient ok'\\)\")",
+      "Bash(py -3 --version)",
+      "Bash(py -3 -m pip list)",
+      "Bash(py -3 -m pip install flask google-auth-oauthlib google-api-python-client)",
+      "Bash(py -3 -c \"import app; print\\('app.py imports OK'\\)\")",
+      "Bash(py:*)",
+      "Bash(.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python -c \"from googleapiclient.discovery import build; print\\('OK'\\)\")",
+      "Bash(python app.py)",
+      "Bash(curl:*)",
+      "Bash(python -c ':*)",
+      "Bash(python -c \"from app import app; print\\('App imports OK'\\)\")",
+      "Bash(.venv/Scripts/pip freeze:*)",
+      "Bash(python -c \"import json; d=json.load\\(open\\('client_secret_592676366237-538t3lj119h6hfical63sc4sf3b42l5a.apps.googleusercontent.com.json'\\)\\); print\\(list\\(d.keys\\(\\)\\)\\); print\\(list\\(d.get\\('web', d.get\\('installed', {}\\)\\).keys\\(\\)\\)\\)\")",
+      "Bash(.venv/Scripts/python -c \"import app; print\\('App loaded OK'\\)\")"
+    ]
+  }
+}

@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="rainforest">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Break Time — StudyDesk</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ── THEMES ──────────────────────────────── */
+[data-theme="rainforest"] {
+  --paper:       #edf4fb; --card: #ffffff; --line: #b0cce6;
+  --ink:         #172840; --muted: #4d7096; --accent: #2a5da8;
+  --accent-soft: #d2e8f9; --accent2: #4f8ec4; --danger: #c0394a;
+  --radius:      14px;
+  --font-heading: "Libre Baskerville", serif;
+  --font-body:    "Source Sans 3", sans-serif;
+  --font-mono:    "Source Code Pro", monospace;
+  --bg: linear-gradient(160deg,#e8f2fb 0%,#edf4fb 50%,#e4f0f9 100%);
+  --wordle-correct: #538d4e; --wordle-present: #b59f3b; --wordle-absent: #787c7e;
+  --wordle-empty: #ffffff;   --wordle-border: #d3d6da;  --wordle-filled: #878a8c;
+}
+[data-theme="dark-academia"] {
+  --paper:       #1c1814; --card: #2a2420; --line: #4a4030;
+  --ink:         #e8dfc8; --muted: #a89878; --accent: #c9a84c;
+  --accent-soft: #3a3020; --accent2: #8b7355; --danger: #e57373;
+  --radius:      14px;
+  --font-heading: "Libre Baskerville", serif;
+  --font-body:    "Source Sans 3", sans-serif;
+  --font-mono:    "Source Code Pro", monospace;
+  --bg: linear-gradient(160deg,#1a1610 0%,#1c1814 50%,#181410 100%);
+  --wordle-correct: #538d4e; --wordle-present: #b59f3b; --wordle-absent: #3a3a3c;
+  --wordle-empty: #2a2420;   --wordle-border: #565758;  --wordle-filled: #817c7c;
+}
+[data-theme="retro"] {
+  --paper:       #080818; --card: #14143a; --line: #2a2a60;
+  --ink:         #e0e8ff; --muted: #7878b0; --accent: #00ff88;
+  --accent-soft: #002a18; --accent2: #ff44ff; --danger: #ff4455;
+  --radius:      4px;
+  --font-heading: "Source Sans 3", sans-serif;
+  --font-body:    "Source Sans 3", sans-serif;
+  --font-mono:    "Source Code Pro", monospace;
+  --bg: radial-gradient(ellipse at top,#1a0a3a 0%,#080818 60%);
+  --wordle-correct: #538d4e; --wordle-present: #b59f3b; --wordle-absent: #3a3a3c;
+  --wordle-empty: #14143a;   --wordle-border: #2a2a60;  --wordle-filled: #5050a0;
+}
+
+/* ── RESET ───────────────────────────────── */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html,body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── PAGE SHELL ──────────────────────────── */
+.break-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+  gap: 20px;
+}
+
+/* ── HEADER BAND ─────────────────────────── */
+.break-header {
+  width: 100%;
+  max-width: 680px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.break-tomato { font-size: 2.4rem; line-height: 1; animation: bounce 1.4s ease-in-out infinite; }
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  45%      { transform: translateY(-8px); }
+}
+
+.break-title {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: var(--accent);
+}
+
+.break-task {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.break-bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.break-countdown-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.break-countdown-label { font-size: 0.68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.break-countdown {
+  font-family: var(--font-mono);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.break-countdown.done { color: var(--danger); }
+
+.break-done-msg {
+  display: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--danger);
+  animation: pulse-text 1s ease-in-out infinite;
+}
+@keyframes pulse-text { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+.break-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid transparent; border-radius: 9px;
+  font-size: 0.84rem; font-weight: 700; font-family: var(--font-body);
+  padding: 8px 16px; cursor: pointer;
+  transition: filter 0.18s, transform 0.18s, box-shadow 0.18s;
+  text-decoration: none;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── GAME SELECTOR ───────────────────────── */
+.game-selector {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  gap: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.game-tab {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.game-tab:hover { color: var(--ink); background: var(--accent-soft); }
+.game-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-soft); }
+
+/* ── GAME PANELS ─────────────────────────── */
+.game-panel { display: none; width: 100%; max-width: 680px; flex-direction: column; align-items: center; gap: 16px; }
+.game-panel.active { display: flex; }
+
+/* ── WORDLE CARD ─────────────────────────── */
+.wordle-card {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.wordle-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+.wordle-card-sub { font-size: 0.75rem; color: var(--muted); margin-top: -8px; }
+
+.wordle-message {
+  height: 26px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.wordle-message.show { opacity: 1; }
+
+.wordle-grid { display: flex; flex-direction: column; gap: 5px; }
+.wordle-row  { display: flex; gap: 5px; }
+
+.wordle-cell {
+  width: 54px; height: 54px;
+  border: 2px solid var(--wordle-border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 1.7rem; font-weight: 700;
+  text-transform: uppercase;
+  background: var(--wordle-empty);
+  color: var(--ink);
+  transition: border-color 0.1s;
+  user-select: none;
+}
+.wordle-cell.filled  { border-color: var(--wordle-filled); animation: pop 0.1s ease; }
+@keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+.wordle-cell.correct { background: var(--wordle-correct); color: #fff; border-color: var(--wordle-correct); }
+.wordle-cell.present { background: var(--wordle-present); color: #fff; border-color: var(--wordle-present); }
+.wordle-cell.absent  { background: var(--wordle-absent);  color: #fff; border-color: var(--wordle-absent); }
+.wordle-cell.reveal  { animation: flip 0.5s ease forwards; }
+@keyframes flip {
+  0%   { transform: rotateX(0deg); }
+  45%  { transform: rotateX(-90deg); background: var(--wordle-empty); }
+  55%  { transform: rotateX(-90deg); }
+  100% { transform: rotateX(0deg); }
+}
+.wordle-row.shake { animation: shake 0.5s ease; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
+}
+
+.wordle-keyboard { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 480px; }
+.kb-row { display: flex; justify-content: center; gap: 5px; }
+.kb-key {
+  height: 54px; min-width: 40px; padding: 0 5px;
+  border-radius: 6px; border: none;
+  background: var(--line); color: var(--ink);
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex: 1; max-width: 44px;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+  user-select: none;
+}
+.kb-key:hover  { transform: translateY(-2px); filter: brightness(1.08); }
+.kb-key:active { transform: translateY(0); }
+.kb-key.wide   { min-width: 62px; max-width: 66px; font-size: 0.7rem; }
+.kb-key.correct { background: var(--wordle-correct); color: #fff; }
+.kb-key.present { background: var(--wordle-present); color: #fff; }
+.kb-key.absent  { background: var(--wordle-absent);  color: #fff; }
+
+.wordle-footer { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+.wordle-result { font-size: 1rem; font-weight: 700; color: var(--accent); min-height: 26px; text-align: center; }
+
+/* ── CROSSWORD ───────────────────────────── */
+.crossword-card {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.cw-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+.cw-puzzle-picker {
+  display: flex;
+  gap: 8px;
+}
+
+.cw-puzzle-btn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.cw-puzzle-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cw-puzzle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.cw-layout {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.cw-grid-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+.cw-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 52px);
+  grid-template-rows: repeat(5, 52px);
+  gap: 3px;
+}
+
+.cw-cell {
+  width: 52px; height: 52px;
+  position: relative;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 1.4rem; font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: text;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.cw-cell.black { background: var(--ink); border-color: var(--ink); cursor: default; }
+.cw-cell.selected { border-color: var(--accent); background: var(--accent-soft); }
+.cw-cell.word-hl { background: var(--accent-soft); }
+.cw-cell.correct-cell { background: #538d4e22; border-color: #538d4e; }
+.cw-cell.wrong-cell   { background: #c0394a22; border-color: var(--danger); animation: shake 0.4s ease; }
+
+.cw-cell-num {
+  position: absolute;
+  top: 2px; left: 3px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  color: var(--muted);
+  line-height: 1;
+}
+
+.cw-clues {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 160px;
+}
+
+.cw-clue-group h4 {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.cw-clue {
+  font-size: 0.82rem;
+  color: var(--ink);
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1.35;
+}
+.cw-clue:hover  { background: var(--accent-soft); }
+.cw-clue.active { background: var(--accent); color: #fff; }
+.cw-clue.solved { color: var(--muted); text-decoration: line-through; }
+
+.cw-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.cw-status { font-size: 0.9rem; font-weight: 700; color: var(--accent); min-height: 24px; }
+
+/* ── FROG GAME ───────────────────────────── */
+.frog-card {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.frog-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+.frog-hud {
+  display: flex;
+  gap: 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.frog-hud span { color: var(--muted); }
+.frog-hud b { color: var(--ink); }
+
+#frog-canvas {
+  border-radius: 10px;
+  border: 2px solid var(--line);
+  display: block;
+  cursor: none;
+  max-width: 100%;
+}
+
+.frog-controls {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.frog-overlay {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+}
+
+.frog-start-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.55);
+  border-radius: 10px;
+  gap: 12px;
+  z-index: 10;
+}
+
+.frog-start-screen h2 { color: #fff; font-size: 1.6rem; }
+.frog-start-screen p  { color: #ccc; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<div class="break-page">
+
+  <!-- ── BREAK HEADER ── -->
+  <div class="break-header">
+    <div class="break-tomato">🍅</div>
+    <div class="break-title">Break Time!</div>
+    <div class="break-task">Nice work on &ldquo;{{ task_name }}&rdquo; &mdash; you earned this.</div>
+
+    <div class="break-bottom-row">
+      <div class="break-countdown-wrap">
+        <div class="break-countdown-label">Break ends in</div>
+        <div class="break-countdown" id="break-countdown">{{ '%02d'|format(break_seconds // 60) }}:{{ '%02d'|format(break_seconds % 60) }}</div>
+        <div class="break-done-msg" id="break-done-msg">⏰ Break over! Head back when you&rsquo;re ready.</div>
+      </div>
+      <div class="break-actions">
+        <a href="/" class="btn btn-primary">← Back to Study</a>
+        <button class="btn btn-ghost" onclick="resetBreakTimer()">↺ Restart Break</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GAME SELECTOR TABS ── -->
+  <div class="game-selector">
+    <button class="game-tab active" id="gtab-wordle"    onclick="showGame('wordle')">🟩 Wordle</button>
+    <button class="game-tab"        id="gtab-crossword" onclick="showGame('crossword')">🔤 Mini Crossword</button>
+    <button class="game-tab"        id="gtab-frog"      onclick="showGame('frog')">🐸 Frog Game</button>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- ── WORDLE PANEL ─────────────────── -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="game-panel active" id="panel-wordle">
+    <div class="wordle-card">
+      <div class="wordle-card-title">Wordle</div>
+      <div class="wordle-card-sub">Guess the 5-letter word in 6 tries &mdash; new word every game</div>
+
+      <div class="wordle-message" id="wordle-msg"></div>
+      <div class="wordle-grid" id="wordle-grid"></div>
+
+      <div class="wordle-keyboard" id="wordle-keyboard">
+        <div class="kb-row" id="kb-row-1"></div>
+        <div class="kb-row" id="kb-row-2"></div>
+        <div class="kb-row" id="kb-row-3"></div>
+      </div>
+
+      <div class="wordle-footer">
+        <div class="wordle-result" id="wordle-result"></div>
+        <button class="btn btn-ghost" id="new-game-btn" onclick="initWordle()" style="display:none">▶ New Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- ── CROSSWORD PANEL ──────────────── -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="game-panel" id="panel-crossword">
+    <div class="crossword-card">
+      <div class="cw-title">Mini Crossword</div>
+
+      <div class="cw-puzzle-picker">
+        <button class="cw-puzzle-btn active" onclick="loadPuzzle(0)">Puzzle 1</button>
+        <button class="cw-puzzle-btn"        onclick="loadPuzzle(1)">Puzzle 2</button>
+        <button class="cw-puzzle-btn"        onclick="loadPuzzle(2)">Puzzle 3</button>
+      </div>
+
+      <div class="cw-layout">
+        <div class="cw-grid-wrap">
+          <div class="cw-grid" id="cw-grid"></div>
+        </div>
+        <div class="cw-clues" id="cw-clues"></div>
+      </div>
+
+      <div class="cw-status" id="cw-status"></div>
+      <div class="cw-actions">
+        <button class="btn btn-ghost" onclick="cwRevealAll()">💡 Reveal</button>
+        <button class="btn btn-ghost" onclick="cwClearAll()">🗑 Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- ── FROG GAME PANEL ──────────────── -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="game-panel" id="panel-frog">
+    <div class="frog-card">
+      <div class="frog-title">🐸 Swamp Hopper</div>
+      <div class="frog-hud">
+        <div><span>Score: </span><b id="frog-score">0</b></div>
+        <div><span>Lives: </span><b id="frog-lives">❤️❤️❤️</b></div>
+        <div><span>Best: </span><b id="frog-best">0</b></div>
+      </div>
+
+      <div class="frog-overlay">
+        <canvas id="frog-canvas" width="720" height="380"></canvas>
+        <div class="frog-start-screen" id="frog-start">
+          <h2>🐸 Swamp Hopper</h2>
+          <p>Collect all the coins!</p>
+          <button class="btn btn-primary" onclick="startFrogGame()">▶ Start Game</button>
+          <p style="font-size:0.75rem;margin-top:4px">WASD / Arrow Keys to move &bull; Space / W / ↑ to jump</p>
+        </div>
+      </div>
+
+      <div class="frog-controls">WASD / Arrow Keys to move &bull; Space / W / ↑ to jump &bull; Collect all coins to win!</div>
+    </div>
+  </div>
+
+</div><!-- .break-page -->
+
+<script>
+/* ════════════════════════════════════════════
+   THEME
+   ════════════════════════════════════════════ */
+(function() {
+  const t = localStorage.getItem("studydesk-theme") || "rainforest";
+  document.documentElement.setAttribute("data-theme", t);
+})();
+
+/* ════════════════════════════════════════════
+   BREAK COUNTDOWN
+   ════════════════════════════════════════════ */
+const BREAK_SECONDS = {{ break_seconds }};
+let breakRemaining = BREAK_SECONDS;
+let breakInterval  = null;
+
+function fmtTime(s) {
+  return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
+}
+
+function tickBreak() {
+  breakRemaining--;
+  const el = document.getElementById("break-countdown");
+  if (breakRemaining <= 0) {
+    breakRemaining = 0;
+    clearInterval(breakInterval);
+    el.textContent = "00:00";
+    el.classList.add("done");
+    document.getElementById("break-done-msg").style.display = "block";
+  } else {
+    el.textContent = fmtTime(breakRemaining);
+  }
+}
+
+function resetBreakTimer() {
+  clearInterval(breakInterval);
+  breakRemaining = BREAK_SECONDS;
+  const el = document.getElementById("break-countdown");
+  el.textContent = fmtTime(breakRemaining);
+  el.classList.remove("done");
+  document.getElementById("break-done-msg").style.display = "none";
+  breakInterval = setInterval(tickBreak, 1000);
+}
+
+breakInterval = setInterval(tickBreak, 1000);
+
+/* ════════════════════════════════════════════
+   GAME SWITCHER
+   ════════════════════════════════════════════ */
+let activeGame = "wordle";
+
+function showGame(name) {
+  ["wordle","crossword","frog"].forEach(g => {
+    document.getElementById("panel-" + g).classList.toggle("active", g === name);
+    document.getElementById("gtab-" + g).classList.toggle("active", g === name);
+  });
+  activeGame = name;
+  // Pause frog if leaving
+  if (name !== "frog" && frogRunning) {
+    frogRunning = false;
+    cancelAnimationFrame(frogRaf);
+  }
+}
+
+/* ════════════════════════════════════════════
+   WORDLE
+   ════════════════════════════════════════════ */
+const WORDS = [
+  "about","above","abuse","actor","acute","admit","adopt","adult","after","again",
+  "agent","agree","ahead","alarm","album","alert","alien","align","alike","alive",
+  "alley","allow","alone","along","alter","angel","anger","angle","angry","ankle",
+  "apart","apple","apply","argue","arise","armor","aroma","arose","array","arrow",
+  "aside","asset","atlas","attic","audio","audit","avoid","award","aware","awful",
+  "badge","badly","basic","basis","batch","beach","beard","beast","began","begin",
+  "being","below","bench","birth","black","blade","blame","bland","blank","blast",
+  "blaze","bleed","bless","blind","block","blood","bloom","blown","blues","blunt",
+  "board","bonus","boost","booth","brain","brand","brave","bread","break","breed",
+  "brick","bride","brief","bring","brisk","broke","brook","broom","brown","brush",
+  "build","built","burst","buyer","cabin","candy","cargo","carry","catch","cause",
+  "chain","chair","chaos","charm","chase","cheap","check","cheek","chess","chest",
+  "chief","child","chill","chunk","civic","civil","claim","clash","class","clean",
+  "clear","clerk","click","cliff","climb","cling","cloak","clock","close","cloud",
+  "clown","coach","coast","costs","cough","could","count","cover","craft","crane",
+  "crash","crazy","creek","creep","crime","crisp","cross","crowd","crown","cruel",
+  "crush","curve","cycle","daily","dance","dealt","death","debut","delay","delta",
+  "dense","depot","depth","devil","dirty","dodge","doubt","dough","draft","drain",
+  "drama","drank","drawn","dream","dress","drift","drink","drive","drone","drove",
+  "drown","drugs","drums","eager","eagle","early","earth","eight","elite","empty",
+  "enemy","enjoy","enter","entry","equal","error","essay","event","every","exact",
+  "extra","fable","faint","fairy","faith","false","fancy","fatal","fault","feast",
+  "fence","ferry","fetch","fever","fewer","fiber","field","fifth","fifty","fight",
+  "final","first","fixed","flame","flare","flash","flask","fleet","flesh","float",
+  "flood","floor","flour","flown","fluid","flute","focus","forge","forum","found",
+  "frame","freed","fresh","front","froze","fruit","funds","funny","games","gauge",
+  "giant","given","glare","glass","glide","gloom","going","grace","grade","grain",
+  "grand","grant","grasp","grass","grate","great","greed","green","greet","grief",
+  "grind","groan","gross","group","grove","grown","guard","guess","guest","guide",
+  "guild","guilt","hands","happy","harsh","haven","heart","heavy","hedge","hence",
+  "herbs","honey","honor","hopes","horse","hotel","hound","house","human","humor",
+  "hurry","ideal","image","imply","index","infer","inner","input","irony","issue",
+  "ivory","jelly","joker","judge","juice","juicy","jumbo","knife","knock","known",
+  "label","large","laser","latch","later","laugh","layer","lease","leave","legal",
+  "lemon","level","light","linen","liver","lives","lobby","local","lodge","logic",
+  "looks","loose","lover","lower","loyal","lucky","lunar","lunch","lyric","magic",
+  "major","maker","manor","maple","march","match","mayor","media","merge","merit",
+  "metal","might","minor","minus","money","month","moral","motor","motto","mourn",
+  "mouth","music","naive","nerve","never","night","noble","north","noted","novel",
+  "nurse","ocean","offer","often","olive","onion","onset","opera","optic","orbit",
+  "order","other","outer","ozone","paint","panic","paper","patch","pause","peace",
+  "pearl","penny","petal","phase","phone","photo","piano","piece","pilot","pixel",
+  "pizza","place","plain","plane","plant","plate","plaza","point","polar","power",
+  "press","price","pride","prime","print","prior","prize","probe","prose","prowl",
+  "proxy","pulse","punch","pupil","purse","queen","query","quest","quiet","quota",
+  "quote","radar","radio","raise","rally","rapid","ratio","reach","realm","rebel",
+  "repay","right","risky","rival","river","rivet","robot","rough","round","royal",
+  "ruins","ruler","rural","sadly","saint","sauce","scale","scare","scene","scent",
+  "scope","score","scout","screw","seize","serve","seven","shade","shall","shame",
+  "shape","share","shark","sharp","shelf","shell","shift","shiny","shoot","shore",
+  "short","shout","shrug","sight","silly","since","sixth","sixty","skill","skull",
+  "slick","slide","slope","smart","smell","smile","smoke","snake","solar","solve",
+  "songs","sorry","south","space","spare","spark","spawn","speak","speed","spend",
+  "spice","spine","spite","split","spoke","spoon","sport","spray","squad","stack",
+  "staff","stage","stain","stale","stall","stamp","stand","stare","stark","start",
+  "state","steal","steam","steep","steer","stern","stick","stiff","still","stock",
+  "stomp","stone","stood","stool","storm","story","stove","strap","straw","stray",
+  "strip","stuck","study","style","sugar","suite","sunny","super","surge","swamp",
+  "swear","sweep","sweet","swift","sword","syrup","table","taken","taste","teach",
+  "tears","tempo","tense","terms","their","theme","there","these","thick","thing",
+  "think","third","thorn","those","threw","throw","tiger","tight","tired","title",
+  "today","token","total","touch","tough","tower","toxic","trace","track","trade",
+  "trail","train","trait","trash","tread","treat","trend","trial","tribe","trick",
+  "tried","troop","truck","truly","trunk","trust","truth","tutor","twice","twist",
+  "ultra","uncle","under","unify","union","unite","unity","until","upper","upset",
+  "urban","usage","usual","utter","valid","valor","value","valve","vigor","viral",
+  "virus","visit","vital","vivid","vocal","voice","voter","wagon","waste","watch",
+  "water","weary","weave","weird","where","which","while","white","whole","whose",
+  "wider","witty","world","worry","worse","worst","worth","would","wound","wrath",
+  "write","wrong","yacht","yearn","years","yield","young","youth","zebra","zones",
+  "bloom","spool","trove","twirl","stoic","brawn","cleft","prism","dwarf","swirl",
+  "blurt","crumb","plank","quilt","glint","fjord","quirk","brine","clamp","gruff",
+  "prank","slump","sniff","tweak","wince","bliss","champ","clout","flair","froth",
+  "giddy","gnome","gourd","graze","gusto","haste","haunt","heave","helix","hitch",
+  "hoard","inept","inert","jiffy","joust","kudos","larva","leafy","leaky","ledge",
+  "leech","libel","liege","lilac","lithe","lofty","lumpy","lusty","maxim","mercy",
+  "messy","mirth","misty","moody","mossy","muddy","murky","musty","nasty","needy",
+  "nerdy","nippy","noisy","notch","nutty","oaken","oasis","ounce","pansy","perky",
+  "pesky","petty","pithy","plaid","plait","pleat","pluck","poach","poppy","pouty",
+  "prone","prune","pudgy","puppy","pygmy","qualm","quash","quell","rabbi","rabid",
+  "ranch","raspy","ratty","rebut","reedy","reign","relax","remix","rerun","retro",
+  "revel","rigid","ripen","risen","roast","rocky","roomy","rowdy","ruddy","rugby",
+  "rummy","rusty","saggy","sandy","sassy","saucy","savvy","scaly","scary","scoff",
+  "scold","scone","scoop","scorn","scour","sedan","seedy","shady","shaky","shard",
+  "sheen","sheik","sissy","skimp","slain","slant","sleek","sleet","slick","slimy",
+  "slosh","sloth","slump","slyly","smack","smear","smelt","smirk","smoky","snarl",
+  "sneak","sneer","snide","snore","snort","snowy","snuck","soggy","spank","spasm",
+  "speck","spiel","spiky","spill","spiny","spoof","spore","spout","spunk","squat",
+  "staid","stalk","steed","stink","stoic","stout","strut","stunk","suave","surly",
+  "swath","swoop","taboo","taffy","tangy","tardy","taunt","tawny","tepid","terse",
+  "testy","thump","timid","tipsy","topaz","torso","totem","tramp","truce","tulle",
+  "tunic","turbo","twang","tweed","twerp","twill","umbra","undue","unfit","unlit",
+  "untie","usurp","vague","vapid","vault","vaunt","venom","verge","vexed","vicar",
+  "vinyl","viper","visor","vista","vixen","vodka","vomit","wacky","wager","waken",
+  "warty","weedy","whelp","whiff","whirl","whisk","widen","wispy","wizen","woozy",
+  "wordy","wrack","wreak","wreck","wring","wrist","yahoo","knack","kneel","anvil"
+];
+
+const VALID_WORDS = [...new Set(WORDS.filter(w => w.length === 5))];
+const MAX_GUESSES = 6;
+const WORD_LEN    = 5;
+const KB_ROWS     = [
+  ["Q","W","E","R","T","Y","U","I","O","P"],
+  ["A","S","D","F","G","H","J","K","L"],
+  ["ENTER","Z","X","C","V","B","N","M","⌫"],
+];
+
+let wAnswer    = "";
+let wGuesses   = [];
+let wCurrent   = "";
+let wGameOver  = false;
+let wRevealing = false;
+
+function pickWord() {
+  return VALID_WORDS[Math.floor(Math.random() * VALID_WORDS.length)].toUpperCase();
+}
+
+function initWordle() {
+  wAnswer    = pickWord();
+  wGuesses   = [];
+  wCurrent   = "";
+  wGameOver  = false;
+  wRevealing = false;
+  document.getElementById("wordle-result").textContent = "";
+  document.getElementById("new-game-btn").style.display = "none";
+  showWMsg("");
+  buildGrid();
+  buildKeyboard();
+}
+
+function buildGrid() {
+  const grid = document.getElementById("wordle-grid");
+  grid.innerHTML = "";
+  for (let r = 0; r < MAX_GUESSES; r++) {
+    const row = document.createElement("div");
+    row.className = "wordle-row";
+    row.id = `wr-${r}`;
+    for (let c = 0; c < WORD_LEN; c++) {
+      const cell = document.createElement("div");
+      cell.className = "wordle-cell";
+      cell.id = `wc-${r}-${c}`;
+      row.appendChild(cell);
+    }
+    grid.appendChild(row);
+  }
+}
+
+function updateCurrentRow() {
+  const r = wGuesses.length;
+  for (let c = 0; c < WORD_LEN; c++) {
+    const cell = document.getElementById(`wc-${r}-${c}`);
+    const letter = wCurrent[c] || "";
+    cell.textContent = letter;
+    cell.classList.toggle("filled", letter !== "");
+  }
+}
+
+function evaluate(guess, ans) {
+  const result   = Array(WORD_LEN).fill("absent");
+  const ansArr   = ans.split("");
+  const guessArr = guess.split("");
+  guessArr.forEach((l, i) => {
+    if (l === ansArr[i]) { result[i] = "correct"; ansArr[i] = null; }
+  });
+  guessArr.forEach((l, i) => {
+    if (result[i] === "correct") return;
+    const idx = ansArr.indexOf(l);
+    if (idx !== -1) { result[i] = "present"; ansArr[idx] = null; }
+  });
+  return result;
+}
+
+function revealRow(rowIdx, result, callback) {
+  wRevealing = true;
+  result.forEach((state, c) => {
+    const cell = document.getElementById(`wc-${rowIdx}-${c}`);
+    setTimeout(() => {
+      cell.classList.add("reveal");
+      setTimeout(() => {
+        cell.classList.remove("filled");
+        cell.classList.add(state);
+      }, 250);
+      if (c === WORD_LEN - 1) {
+        setTimeout(() => { wRevealing = false; callback && callback(); }, 500 + 50 * WORD_LEN);
+      }
+    }, c * 100);
+  });
+}
+
+function submitGuess() {
+  if (wRevealing) return;
+  if (wCurrent.length !== WORD_LEN) { showWMsg("Not enough letters"); shakeRow(wGuesses.length); return; }
+  if (!VALID_WORDS.includes(wCurrent.toLowerCase())) { showWMsg("Not in word list"); shakeRow(wGuesses.length); return; }
+  const result = evaluate(wCurrent, wAnswer);
+  const rowIdx = wGuesses.length;
+  wGuesses.push({ word: wCurrent, result });
+  wCurrent = "";
+  revealRow(rowIdx, result, () => {
+    updateWKeyboard();
+    const won = result.every(r => r === "correct");
+    if (won) {
+      const msgs = ["Genius! 🧠","Brilliant! 🎉","Impressive! ⭐","Splendid! 🌟","Great! 👍","Phew! 😅"];
+      showWResult(msgs[Math.min(rowIdx, msgs.length - 1)]);
+      wGameOver = true;
+      document.getElementById("new-game-btn").style.display = "";
+    } else if (wGuesses.length >= MAX_GUESSES) {
+      showWResult(`The word was ${wAnswer} 😬`);
+      wGameOver = true;
+      document.getElementById("new-game-btn").style.display = "";
+    }
+  });
+}
+
+function handleKey(key) {
+  if (activeGame !== "wordle") return;
+  if (wGameOver || wRevealing) return;
+  clearWMsg();
+  if (key === "ENTER") { submitGuess(); }
+  else if (key === "BACKSPACE" || key === "⌫") {
+    wCurrent = wCurrent.slice(0, -1);
+    updateCurrentRow();
+  } else if (/^[A-Z]$/.test(key) && wCurrent.length < WORD_LEN) {
+    wCurrent += key;
+    updateCurrentRow();
+  }
+}
+
+function buildKeyboard() {
+  KB_ROWS.forEach((row, i) => {
+    const rowEl = document.getElementById(`kb-row-${i+1}`);
+    rowEl.innerHTML = "";
+    row.forEach(key => {
+      const btn = document.createElement("button");
+      btn.className = "kb-key" + (key.length > 1 ? " wide" : "");
+      btn.textContent = key;
+      btn.id = `kb-${key}`;
+      btn.addEventListener("click", () => handleKey(key === "⌫" ? "BACKSPACE" : key));
+      rowEl.appendChild(btn);
+    });
+  });
+}
+
+function updateWKeyboard() {
+  const state    = {};
+  const priority = { correct: 3, present: 2, absent: 1 };
+  wGuesses.forEach(({ word, result }) => {
+    result.forEach((s, i) => {
+      const l = word[i];
+      if (!state[l] || priority[s] > priority[state[l]]) state[l] = s;
+    });
+  });
+  Object.entries(state).forEach(([letter, s]) => {
+    const btn = document.getElementById(`kb-${letter}`);
+    if (btn) { btn.className = `kb-key${letter.length > 1 ? " wide" : ""} ${s}`; }
+  });
+}
+
+let wMsgTimer = null;
+function showWMsg(txt) {
+  const el = document.getElementById("wordle-msg");
+  el.textContent = txt;
+  el.classList.toggle("show", !!txt);
+  clearTimeout(wMsgTimer);
+  if (txt) wMsgTimer = setTimeout(clearWMsg, 2000);
+}
+function clearWMsg() { document.getElementById("wordle-msg").classList.remove("show"); }
+function showWResult(txt) { document.getElementById("wordle-result").textContent = txt; }
+function shakeRow(r) {
+  const row = document.getElementById(`wr-${r}`);
+  if (!row) return;
+  row.classList.add("shake");
+  row.addEventListener("animationend", () => row.classList.remove("shake"), { once: true });
+}
+
+/* ════════════════════════════════════════════
+   MINI CROSSWORD
+   ════════════════════════════════════════════ */
+
+/* Puzzles: grid[row][col] = null (black) or letter string
+   clues: array of { num, dir, clue, answer, r, c }  */
+const PUZZLES = [
+  {
+    // 5x5  Puzzle 1: FROG / REST / TIES / GAME
+    grid: [
+      [null,"F",null,null,null],
+      [null,"R","E","S","T"],
+      [null,"O",null,null,"I"],
+      [null,"G","A","M","E"],
+      [null,null,null,null,"S"]
+    ],
+    clues: [
+      { num:1, dir:"down",   clue:"Swamp jumper",            answer:"FROG", r:0, c:1 },
+      { num:2, dir:"across", clue:"Relaxation break",        answer:"REST", r:1, c:1 },
+      { num:3, dir:"down",   clue:"Knotted fasteners",       answer:"TIES", r:1, c:4 },
+      { num:4, dir:"across", clue:"Fun activity to play",    answer:"GAME", r:3, c:1 },
+    ]
+  },
+  {
+    // 5x5  Puzzle 2: NOTES/NIGHT/ELATE/SUGAR/TIMER
+    grid: [
+      ["N","O","T","E","S"],
+      ["I",null,null,"L","U"],
+      ["G",null,null,"A","G"],
+      ["H",null,null,"T","A"],
+      ["T","I","M","E","R"]
+    ],
+    clues: [
+      { num:1, dir:"across", clue:"Written reminders",       answer:"NOTES", r:0, c:0 },
+      { num:1, dir:"down",   clue:"Opposite of day",         answer:"NIGHT", r:0, c:0 },
+      { num:2, dir:"down",   clue:"Make very happy",         answer:"ELATE", r:0, c:3 },
+      { num:3, dir:"down",   clue:"Sweetener for coffee",    answer:"SUGAR", r:0, c:4 },
+      { num:4, dir:"across", clue:"Countdown device",        answer:"TIMER", r:4, c:0 },
+    ]
+  },
+  {
+    // 5x5  Puzzle 3: BRAIN/BEATS/ALPHA/SWAMP
+    grid: [
+      ["B","R","A","I","N"],
+      ["E",null,"L",null,null],
+      ["A",null,"P",null,null],
+      ["T",null,"H",null,null],
+      ["S","W","A","M","P"]
+    ],
+    clues: [
+      { num:1, dir:"across", clue:"Thinking organ",          answer:"BRAIN", r:0, c:0 },
+      { num:1, dir:"down",   clue:"Heart ___",               answer:"BEATS", r:0, c:0 },
+      { num:2, dir:"down",   clue:"First Greek letter",      answer:"ALPHA", r:0, c:2 },
+      { num:3, dir:"across", clue:"Frog's home",             answer:"SWAMP", r:4, c:0 },
+    ]
+  }
+];
+
+let cwPuzzle    = 0;
+let cwSelected  = null; // { r, c }
+let cwDir       = "across";
+let cwUserGrid  = [];   // [r][c] = letter or ""
+let cwSolved    = new Set(); // "num-dir" strings
+
+function loadPuzzle(idx) {
+  cwPuzzle   = idx;
+  cwSelected = null;
+  cwDir      = "across";
+  cwSolved   = new Set();
+
+  // Update puzzle buttons
+  document.querySelectorAll(".cw-puzzle-btn").forEach((b, i) => {
+    b.classList.toggle("active", i === idx);
+  });
+
+  // Init user grid
+  const p = PUZZLES[idx];
+  cwUserGrid = p.grid.map(row => row.map(c => c === null ? null : ""));
+
+  renderCWGrid();
+  renderCWClues();
+  document.getElementById("cw-status").textContent = "";
+}
+
+function cwCellId(r, c) { return `cwc-${r}-${c}`; }
+
+function renderCWGrid() {
+  const p    = PUZZLES[cwPuzzle];
+  const nums = getCWNumbers(p);
+  const el   = document.getElementById("cw-grid");
+  el.innerHTML = "";
+
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      const div = document.createElement("div");
+      div.id    = cwCellId(r, c);
+
+      if (p.grid[r][c] === null) {
+        div.className = "cw-cell black";
+      } else {
+        div.className = "cw-cell";
+        div.dataset.r = r;
+        div.dataset.c = c;
+        div.tabIndex  = 0;
+        div.addEventListener("click", () => cwClickCell(r, c));
+
+        const letter = cwUserGrid[r][c] || "";
+        div.textContent = letter;
+
+        if (nums[`${r},${c}`]) {
+          const numSpan = document.createElement("span");
+          numSpan.className   = "cw-cell-num";
+          numSpan.textContent = nums[`${r},${c}`];
+          div.prepend(numSpan);
+        }
+      }
+      el.appendChild(div);
+    }
+  }
+  highlightCWWord();
+}
+
+function getCWNumbers(p) {
+  /* Assign sequential numbers top-left to bottom-right.
+     A cell gets a number if it starts an across word (leftmost of >=2)
+     or a down word (topmost of >=2). */
+  const nums = {};
+  let n = 1;
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      if (p.grid[r][c] === null) continue;
+      const startsAcross = (c === 0 || p.grid[r][c-1] === null) && (c < 4 && p.grid[r][c+1] !== null);
+      const startsDown   = (r === 0 || p.grid[r-1][c] === null) && (r < 4 && p.grid[r+1][c] !== null);
+      if (startsAcross || startsDown) {
+        nums[`${r},${c}`] = n++;
+      }
+    }
+  }
+  return nums;
+}
+
+function cwClickCell(r, c) {
+  const p = PUZZLES[cwPuzzle];
+  if (p.grid[r][c] === null) return;
+
+  if (cwSelected && cwSelected.r === r && cwSelected.c === c) {
+    // Toggle direction
+    cwDir = cwDir === "across" ? "down" : "across";
+  } else {
+    cwSelected = { r, c };
+  }
+  renderCWGrid();
+  document.getElementById(cwCellId(r, c)).focus();
+}
+
+function highlightCWWord() {
+  if (!cwSelected) return;
+  const p = PUZZLES[cwPuzzle];
+  const { r, c } = cwSelected;
+
+  // Find the word extent in current direction
+  const cells = getCWWordCells(r, c, cwDir, p);
+
+  document.querySelectorAll(".cw-cell:not(.black)").forEach(el => {
+    el.classList.remove("selected","word-hl");
+  });
+
+  cells.forEach(([cr, cc]) => {
+    const el = document.getElementById(cwCellId(cr, cc));
+    if (el) el.classList.add("word-hl");
+  });
+  const selEl = document.getElementById(cwCellId(r, c));
+  if (selEl) selEl.classList.add("selected");
+
+  // Highlight matching clue
+  highlightCWClue(r, c);
+}
+
+function getCWWordCells(r, c, dir, p) {
+  const cells = [];
+  if (dir === "across") {
+    let sc = c;
+    while (sc > 0 && p.grid[r][sc-1] !== null) sc--;
+    for (let cc = sc; cc < 5 && p.grid[r][cc] !== null; cc++) cells.push([r, cc]);
+  } else {
+    let sr = r;
+    while (sr > 0 && p.grid[sr-1][c] !== null) sr--;
+    for (let rr = sr; rr < 5 && p.grid[rr][c] !== null; rr++) cells.push([rr, c]);
+  }
+  return cells;
+}
+
+function highlightCWClue(r, c) {
+  const p = PUZZLES[cwPuzzle];
+  const cells = getCWWordCells(r, c, cwDir, p);
+  if (cells.length < 2) return;
+
+  // Find which clue owns this word
+  const clue = PUZZLES[cwPuzzle].clues.find(cl => {
+    if (cl.dir !== cwDir) return false;
+    const [cr, cc] = [cl.r, cl.c];
+    return cells.some(([tr, tc]) => tr === cr && tc === cc);
+  });
+
+  document.querySelectorAll(".cw-clue").forEach(el => el.classList.remove("active"));
+  if (clue) {
+    const id = `cwclue-${clue.num}-${clue.dir}`;
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add("active");
+      el.scrollIntoView({ block: "nearest" });
+    }
+  }
+}
+
+function renderCWClues() {
+  const p   = PUZZLES[cwPuzzle];
+  const el  = document.getElementById("cw-clues");
+  el.innerHTML = "";
+
+  const across = p.clues.filter(c => c.dir === "across");
+  const down   = p.clues.filter(c => c.dir === "down");
+
+  function makeGroup(title, clues) {
+    const g = document.createElement("div");
+    g.className = "cw-clue-group";
+    g.innerHTML = `<h4>${title}</h4>`;
+    clues.forEach(cl => {
+      const div = document.createElement("div");
+      div.className = "cw-clue";
+      div.id        = `cwclue-${cl.num}-${cl.dir}`;
+      div.textContent = `${cl.num}. ${cl.clue}`;
+      if (cwSolved.has(`${cl.num}-${cl.dir}`)) div.classList.add("solved");
+      div.addEventListener("click", () => {
+        cwSelected = { r: cl.r, c: cl.c };
+        cwDir      = cl.dir;
+        renderCWGrid();
+        document.getElementById(cwCellId(cl.r, cl.c))?.focus();
+      });
+      g.appendChild(div);
+    });
+    return g;
+  }
+
+  if (across.length) el.appendChild(makeGroup("Across", across));
+  if (down.length)   el.appendChild(makeGroup("Down",   down));
+}
+
+// Keyboard input for crossword
+document.addEventListener("keydown", e => {
+  if (activeGame !== "crossword" || !cwSelected) return;
+
+  const p = PUZZLES[cwPuzzle];
+  const { r, c } = cwSelected;
+
+  if (p.grid[r][c] === null) return;
+
+  const key = e.key.toUpperCase();
+
+  if (key === "BACKSPACE" || key === "DELETE") {
+    e.preventDefault();
+    cwUserGrid[r][c] = "";
+    updateCWCell(r, c);
+    // Move backwards
+    moveCWCursor(-1);
+    return;
+  }
+
+  if (key === "ARROWLEFT")  { e.preventDefault(); cwDir="across"; moveCWCursor(-1); return; }
+  if (key === "ARROWRIGHT") { e.preventDefault(); cwDir="across"; moveCWCursor(1);  return; }
+  if (key === "ARROWUP")    { e.preventDefault(); cwDir="down";   moveCWCursor(-1); return; }
+  if (key === "ARROWDOWN")  { e.preventDefault(); cwDir="down";   moveCWCursor(1);  return; }
+  if (key === "TAB")        { e.preventDefault(); cwDir = cwDir==="across"?"down":"across"; renderCWGrid(); return; }
+
+  if (/^[A-Z]$/.test(key)) {
+    e.preventDefault();
+    cwUserGrid[r][c] = key;
+    updateCWCell(r, c);
+    checkCWWord(r, c);
+    moveCWCursor(1);
+  }
+});
+
+function moveCWCursor(delta) {
+  if (!cwSelected) return;
+  const p = PUZZLES[cwPuzzle];
+  let { r, c } = cwSelected;
+
+  if (cwDir === "across") {
+    c += delta;
+    while (c >= 0 && c < 5 && p.grid[r][c] === null) c += delta;
+    if (c < 0 || c >= 5) return;
+  } else {
+    r += delta;
+    while (r >= 0 && r < 5 && p.grid[r][c] === null) r += delta;
+    if (r < 0 || r >= 5) return;
+  }
+
+  cwSelected = { r, c };
+  renderCWGrid();
+  document.getElementById(cwCellId(r, c))?.focus();
+}
+
+function updateCWCell(r, c) {
+  const el = document.getElementById(cwCellId(r, c));
+  if (!el) return;
+  // Preserve number span
+  const numSpan = el.querySelector(".cw-cell-num");
+  el.textContent = cwUserGrid[r][c] || "";
+  if (numSpan) el.prepend(numSpan);
+}
+
+function checkCWWord(r, c) {
+  const p     = PUZZLES[cwPuzzle];
+  const dirs  = ["across","down"];
+  dirs.forEach(dir => {
+    const cells  = getCWWordCells(r, c, dir, p);
+    if (cells.length < 2) return;
+
+    // Find matching clue
+    const clue = p.clues.find(cl => {
+      if (cl.dir !== dir) return false;
+      return cells.some(([tr, tc]) => tr === cl.r && tc === cl.c);
+    });
+    if (!clue) return;
+
+    const key    = `${clue.num}-${clue.dir}`;
+    const filled = cells.every(([tr, tc]) => !!cwUserGrid[tr][tc]);
+    if (!filled) return;
+
+    const word   = cells.map(([tr, tc]) => cwUserGrid[tr][tc]).join("");
+    const correct = word === clue.answer;
+
+    cells.forEach(([tr, tc]) => {
+      const el = document.getElementById(cwCellId(tr, tc));
+      if (el) {
+        el.classList.remove("correct-cell","wrong-cell");
+        el.classList.add(correct ? "correct-cell" : "wrong-cell");
+        if (!correct) {
+          el.addEventListener("animationend", () => el.classList.remove("wrong-cell"), { once: true });
+        }
+      }
+    });
+
+    if (correct) {
+      cwSolved.add(key);
+      const clueEl = document.getElementById(`cwclue-${clue.num}-${clue.dir}`);
+      if (clueEl) clueEl.classList.add("solved");
+    }
+
+    // Check overall win
+    const total = p.clues.length;
+    // Deduplicate by num+dir
+    const uniqueKeys = [...new Set(p.clues.map(cl => `${cl.num}-${cl.dir}`))];
+    if (uniqueKeys.every(k => cwSolved.has(k))) {
+      document.getElementById("cw-status").textContent = "🎉 Puzzle complete!";
+    }
+  });
+}
+
+function cwRevealAll() {
+  const p = PUZZLES[cwPuzzle];
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      if (p.grid[r][c] !== null) {
+        cwUserGrid[r][c] = p.grid[r][c];
+        updateCWCell(r, c);
+        const el = document.getElementById(cwCellId(r, c));
+        if (el) el.classList.add("correct-cell");
+      }
+    }
+  }
+  // Mark all clues solved
+  p.clues.forEach(cl => {
+    cwSolved.add(`${cl.num}-${cl.dir}`);
+    const el = document.getElementById(`cwclue-${cl.num}-${cl.dir}`);
+    if (el) el.classList.add("solved");
+  });
+  document.getElementById("cw-status").textContent = "🎉 Puzzle revealed!";
+}
+
+function cwClearAll() {
+  const p = PUZZLES[cwPuzzle];
+  cwSolved.clear();
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      if (p.grid[r][c] !== null) {
+        cwUserGrid[r][c] = "";
+        updateCWCell(r, c);
+        const el = document.getElementById(cwCellId(r, c));
+        if (el) el.classList.remove("correct-cell","wrong-cell");
+      }
+    }
+  }
+  document.querySelectorAll(".cw-clue").forEach(el => el.classList.remove("solved"));
+  document.getElementById("cw-status").textContent = "";
+}
+
+/* ════════════════════════════════════════════
+   FROG PLATFORMER
+   ════════════════════════════════════════════ */
+const fCanvas  = document.getElementById("frog-canvas");
+const fCtx     = fCanvas.getContext("2d");
+const CW       = 720, CH = 380;
+
+const GRAVITY   = 0.48;
+const JUMP_FORCE = -11.5;
+const MOVE_SPD  = 4.2;
+const MAX_FALL  = 16;
+const WATER_Y   = 320;
+
+let frogRunning = false;
+let frogRaf     = null;
+
+let frog = {};
+let platforms = [];
+let coins     = [];
+let fireflies = [];
+let ripples   = [];
+let particles = [];
+let frogScore  = 0;
+let frogLives  = 3;
+let frogBest   = 0;
+let frogDead   = false;
+let frogWon    = false;
+let frogFrames = 0;
+let keys       = {};
+
+function buildLevel() {
+  /* Platforms: { x, y, w, h } */
+  platforms = [
+    // ground lily pads - bottom row ~270
+    { x: 30,  y: 275, w: 90,  h: 14 },
+    { x: 165, y: 268, w: 80,  h: 14 },
+    { x: 285, y: 272, w: 95,  h: 14 },
+    { x: 420, y: 265, w: 85,  h: 14 },
+    { x: 550, y: 270, w: 100, h: 14 },
+    { x: 650, y: 263, w: 60,  h: 14 },
+    // mid row ~210
+    { x: 80,  y: 215, w: 80,  h: 14 },
+    { x: 210, y: 208, w: 90,  h: 14 },
+    { x: 360, y: 212, w: 70,  h: 14 },
+    { x: 480, y: 205, w: 85,  h: 14 },
+    { x: 610, y: 210, w: 70,  h: 14 },
+    // upper row ~150
+    { x: 40,  y: 152, w: 75,  h: 14 },
+    { x: 175, y: 145, w: 85,  h: 14 },
+    { x: 320, y: 149, w: 90,  h: 14 },
+    { x: 465, y: 143, w: 80,  h: 14 },
+    { x: 590, y: 150, w: 90,  h: 14 },
+    // top ~90
+    { x: 290, y: 90,  w: 140, h: 14 },
+  ];
+
+  /* Coins placed above each platform */
+  coins = platforms.map((p, i) => ({
+    x: p.x + p.w / 2,
+    y: p.y - 22,
+    r: 9,
+    collected: false,
+    id: i,
+    bob: Math.random() * Math.PI * 2
+  }));
+}
+
+function resetFrog() {
+  frog = {
+    x: 60, y: 240,
+    vx: 0, vy: 0,
+    w: 30, h: 24,
+    onGround: false,
+    facing: 1,   // 1=right -1=left
+    squish: 0,   // >0 = squat on land, <0 = stretch on jump
+    invincible: 0,
+  };
+}
+
+function spawnFireflies() {
+  fireflies = Array.from({ length: 18 }, () => ({
+    x: Math.random() * CW,
+    y: 60 + Math.random() * 200,
+    vx: (Math.random() - 0.5) * 0.5,
+    vy: (Math.random() - 0.5) * 0.4,
+    alpha: Math.random(),
+    fadeDir: Math.random() > 0.5 ? 1 : -1,
+    size: 2 + Math.random() * 2
+  }));
+}
+
+function startFrogGame() {
+  document.getElementById("frog-start").style.display = "none";
+  frogScore = 0; frogLives = 3;
+  frogDead = false; frogWon = false; frogFrames = 0;
+  buildLevel();
+  resetFrog();
+  spawnFireflies();
+  ripples = []; particles = [];
+  keys = {};
+  frogRunning = true;
+  updateFrogHUD();
+  requestAnimationFrame(frogLoop);
+}
+
+function frogLoop(ts) {
+  if (!frogRunning) return;
+  frogFrames++;
+  frogUpdate();
+  frogDraw();
+  frogRaf = requestAnimationFrame(frogLoop);
+}
+
+function frogUpdate() {
+  if (frogDead || frogWon) return;
+
+  /* Input */
+  const left  = keys["ArrowLeft"]  || keys["a"] || keys["A"];
+  const right = keys["ArrowRight"] || keys["d"] || keys["D"];
+  const jump  = keys["ArrowUp"]    || keys["w"] || keys["W"] || keys[" "];
+
+  if (left)  { frog.vx = -MOVE_SPD; frog.facing = -1; }
+  if (right) { frog.vx =  MOVE_SPD; frog.facing =  1; }
+  if (!left && !right) frog.vx *= 0.78;
+
+  if (jump && frog.onGround) {
+    frog.vy = JUMP_FORCE;
+    frog.onGround = false;
+    frog.squish = -0.35;
+  }
+
+  /* Physics */
+  frog.vy = Math.min(frog.vy + GRAVITY, MAX_FALL);
+  frog.x += frog.vx;
+  frog.y += frog.vy;
+
+  /* Squish/stretch */
+  if (frog.squish > 0) frog.squish -= 0.06;
+  else if (frog.squish < 0) frog.squish += 0.04;
+  if (Math.abs(frog.squish) < 0.01) frog.squish = 0;
+
+  /* Wall wrap */
+  if (frog.x + frog.w < 0) frog.x = CW;
+  if (frog.x > CW) frog.x = -frog.w;
+
+  /* Platform collision */
+  frog.onGround = false;
+  for (const p of platforms) {
+    if (frog.vy >= 0 &&
+        frog.x + frog.w - 4 > p.x &&
+        frog.x + 4 < p.x + p.w &&
+        frog.y + frog.h > p.y &&
+        frog.y + frog.h < p.y + p.h + frog.vy + 2) {
+      frog.y = p.y - frog.h;
+      frog.vy = 0;
+      frog.onGround = true;
+      if (frog.squish === 0) frog.squish = 0.3; // land squish
+    }
+  }
+
+  /* Fall into water */
+  if (frog.y + frog.h >= WATER_Y) {
+    spawnSplash(frog.x + frog.w/2, WATER_Y);
+    frogLives--;
+    updateFrogHUD();
+    if (frogLives <= 0) {
+      frogDead = true;
+      setTimeout(showFrogEnd, 900);
+    } else {
+      resetFrog();
+      if (frog.invincible === 0) frog.invincible = 120;
+    }
+  }
+
+  /* Coin collection */
+  coins.forEach(coin => {
+    if (coin.collected) return;
+    coin.bob += 0.06;
+    const dy = Math.abs((frog.y + frog.h/2) - (coin.y + Math.sin(coin.bob)*4));
+    const dx = Math.abs((frog.x + frog.w/2) - coin.x);
+    if (dx < coin.r + 10 && dy < coin.r + 14) {
+      coin.collected = true;
+      frogScore++;
+      spawnCoinPop(coin.x, coin.y);
+      updateFrogHUD();
+    }
+  });
+
+  if (coins.every(c => c.collected)) {
+    frogWon = true;
+    if (frogScore > frogBest) frogBest = frogScore;
+    updateFrogHUD();
+    setTimeout(showFrogEnd, 900);
+  }
+
+  /* Particles */
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.2;
+    p.life -= 2; p.alpha = p.life / p.maxLife;
+  });
+
+  /* Ripples */
+  ripples = ripples.filter(r => r.alpha > 0);
+  ripples.forEach(r => { r.r += 1.2; r.alpha -= 0.025; });
+
+  /* Fireflies */
+  fireflies.forEach(f => {
+    f.x += f.vx; f.y += f.vy;
+    if (f.x < 0) f.x = CW; if (f.x > CW) f.x = 0;
+    if (f.y < 40) f.vy = Math.abs(f.vy);
+    if (f.y > WATER_Y - 20) f.vy = -Math.abs(f.vy);
+    f.alpha += f.fadeDir * 0.025;
+    if (f.alpha >= 1) f.fadeDir = -1;
+    if (f.alpha <= 0) f.fadeDir = 1;
+    f.alpha = Math.max(0, Math.min(1, f.alpha));
+  });
+
+  /* Invincibility timer */
+  if (frog.invincible > 0) frog.invincible--;
+}
+
+function spawnSplash(x, y) {
+  ripples.push({ x, y, r: 6, alpha: 0.8 });
+  for (let i = 0; i < 8; i++) {
+    const angle = Math.random() * Math.PI;
+    const spd   = 2 + Math.random() * 3;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * spd * (Math.random() > 0.5 ? 1 : -1),
+      vy: -Math.abs(Math.sin(angle)) * spd,
+      life: 60, maxLife: 60, alpha: 1,
+      color: "#5bc8fa", r: 2 + Math.random() * 2
+    });
+  }
+}
+
+function spawnCoinPop(x, y) {
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI * 2 * i) / 6;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * 2.5,
+      vy: Math.sin(angle) * 2.5 - 2,
+      life: 40, maxLife: 40, alpha: 1,
+      color: "#ffd700", r: 3
+    });
+  }
+}
+
+function updateFrogHUD() {
+  document.getElementById("frog-score").textContent = frogScore;
+  document.getElementById("frog-lives").textContent = "❤️".repeat(Math.max(0, frogLives));
+  document.getElementById("frog-best").textContent  = frogBest;
+}
+
+function showFrogEnd() {
+  const screen = document.getElementById("frog-start");
+  screen.innerHTML = `
+    <h2>${frogWon ? "🎉 You Win!" : "💀 Game Over"}</h2>
+    <p>Score: ${frogScore} coins${frogWon ? " — Perfect!" : ""}</p>
+    <button class="btn btn-primary" onclick="startFrogGame()">▶ Play Again</button>
+  `;
+  screen.style.display = "flex";
+}
+
+/* ── DRAWING ───────────────────────────── */
+function frogDraw() {
+  const ctx = fCtx;
+  ctx.clearRect(0, 0, CW, CH);
+
+  drawSwampBg(ctx);
+  drawFireflies(ctx);
+  drawPlatforms(ctx);
+  drawCoins(ctx);
+  drawParticles(ctx);
+  drawRipples(ctx);
+
+  if (frog.invincible === 0 || Math.floor(frogFrames / 5) % 2 === 0) {
+    drawFrog(ctx);
+  }
+
+  if (frogDead || frogWon) {
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.fillRect(0, 0, CW, CH);
+  }
+}
+
+function drawSwampBg(ctx) {
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, WATER_Y);
+  sky.addColorStop(0, "#1a3a1a");
+  sky.addColorStop(0.5, "#2a5c2a");
+  sky.addColorStop(1, "#3a6b30");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, CW, WATER_Y);
+
+  // Moon
+  ctx.save();
+  ctx.fillStyle = "rgba(255,255,200,0.85)";
+  ctx.shadowColor = "rgba(255,255,180,0.6)";
+  ctx.shadowBlur = 18;
+  ctx.beginPath();
+  ctx.arc(640, 42, 22, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Tree silhouettes
+  const trees = [
+    { x: 0,   w: 55, h: 130 },
+    { x: 50,  w: 45, h: 110 },
+    { x: 155, w: 50, h: 140 },
+    { x: 530, w: 60, h: 120 },
+    { x: 600, w: 45, h: 145 },
+    { x: 660, w: 55, h: 110 },
+  ];
+  trees.forEach(t => {
+    ctx.fillStyle = "rgba(10,30,10,0.85)";
+    // Trunk
+    ctx.fillRect(t.x + t.w/2 - 6, WATER_Y - t.h, 12, t.h);
+    // Canopy blobs
+    ctx.beginPath();
+    ctx.ellipse(t.x + t.w/2, WATER_Y - t.h, t.w/2, 55, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(t.x + t.w/2 - 18, WATER_Y - t.h + 20, t.w/2 - 8, 40, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(t.x + t.w/2 + 18, WATER_Y - t.h + 15, t.w/2 - 8, 42, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Water body
+  const water = ctx.createLinearGradient(0, WATER_Y, 0, CH);
+  water.addColorStop(0, "#1a4a2a");
+  water.addColorStop(1, "#0d2d18");
+  ctx.fillStyle = water;
+  ctx.fillRect(0, WATER_Y, CW, CH - WATER_Y);
+
+  // Water shimmer
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  for (let i = 0; i < 8; i++) {
+    const t = (frogFrames * 0.5 + i * 40) % CW;
+    ctx.fillStyle = "#7fffaf";
+    ctx.fillRect(t, WATER_Y + 4, 30 + i * 5, 2);
+  }
+  ctx.restore();
+}
+
+function drawPlatforms(ctx) {
+  platforms.forEach(p => {
+    // Lily pad body
+    const g = ctx.createRadialGradient(p.x + p.w/2, p.y, 2, p.x + p.w/2, p.y, p.w/2);
+    g.addColorStop(0, "#5de86a");
+    g.addColorStop(0.7, "#3ab847");
+    g.addColorStop(1, "#1e8c2c");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(p.x + p.w/2, p.y + 4, p.w/2, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Top surface
+    ctx.fillStyle = "#4dcc5a";
+    ctx.beginPath();
+    ctx.ellipse(p.x + p.w/2, p.y, p.w/2, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Veins
+    ctx.strokeStyle = "rgba(20,120,30,0.4)";
+    ctx.lineWidth = 1;
+    const cx = p.x + p.w/2, cy = p.y;
+    for (let i = 0; i < 4; i++) {
+      const angle = (Math.PI / 4) * i - Math.PI/8;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(angle) * p.w/2 * 0.85, cy + Math.sin(angle) * 5);
+      ctx.stroke();
+    }
+  });
+}
+
+function drawCoins(ctx) {
+  coins.forEach(coin => {
+    if (coin.collected) return;
+    const bob = Math.sin(coin.bob) * 4;
+    const cy  = coin.y + bob;
+    // Outer glow
+    ctx.save();
+    ctx.shadowColor = "#ffd700";
+    ctx.shadowBlur  = 10;
+    // Coin body
+    const g = ctx.createRadialGradient(coin.x - 2, cy - 2, 1, coin.x, cy, coin.r);
+    g.addColorStop(0, "#fff176");
+    g.addColorStop(0.5, "#ffd700");
+    g.addColorStop(1, "#b8860b");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(coin.x, cy, coin.r, 0, Math.PI * 2);
+    ctx.fill();
+    // Star on coin
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.font = `${coin.r}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("★", coin.x, cy);
+    ctx.restore();
+  });
+}
+
+function drawFrog(ctx) {
+  const fx = frog.x + frog.w / 2;
+  const fy = frog.y + frog.h / 2;
+  const sq = frog.squish;
+
+  ctx.save();
+  ctx.translate(fx, fy);
+  ctx.scale(frog.facing, 1);
+
+  // Squish/stretch transform
+  ctx.scale(1 + sq * 0.5, 1 - sq * 0.35);
+
+  // Shadow
+  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  ctx.beginPath();
+  ctx.ellipse(0, frog.h/2 + 2, frog.w/2, 4, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Body
+  const bodyG = ctx.createRadialGradient(-2, -3, 2, 0, 0, 16);
+  bodyG.addColorStop(0, "#6adc5a");
+  bodyG.addColorStop(0.6, "#3eb84a");
+  bodyG.addColorStop(1, "#1a8a28");
+  ctx.fillStyle = bodyG;
+  ctx.beginPath();
+  ctx.ellipse(0, 2, 15, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Belly
+  ctx.fillStyle = "#c8f0b0";
+  ctx.beginPath();
+  ctx.ellipse(0, 5, 9, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Back legs (simple)
+  ctx.fillStyle = "#2ea038";
+  ctx.beginPath();
+  ctx.ellipse(-8, 10, 7, 4, -0.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(8, 10, 7, 4, 0.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Front arms
+  ctx.fillStyle = "#3ab844";
+  ctx.beginPath();
+  ctx.ellipse(-12, 2, 5, 3, -0.8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(12, 2, 5, 3, 0.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eye bumps on top of head (frog-style raised eyes)
+  ctx.fillStyle = "#3eb84a";
+  ctx.beginPath();
+  ctx.ellipse(-6, -11, 6.5, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(6, -11, 6.5, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eye whites — both same height, symmetric
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(-6, -12, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(6, -12, 5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Pupils — both looking forward, centered
+  ctx.fillStyle = "#1a1a2e";
+  ctx.beginPath();
+  ctx.arc(-5.5, -12, 2.8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(6.5, -12, 2.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Pupil shine
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.beginPath();
+  ctx.arc(-4.5, -13, 1.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(7.5, -13, 1.1, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Happy smile — upward curve
+  ctx.strokeStyle = "#0d6e1a";
+  ctx.lineWidth   = 2;
+  ctx.lineCap     = "round";
+  ctx.beginPath();
+  ctx.moveTo(-5, -3);
+  ctx.quadraticCurveTo(0, 2, 5, -3);
+  ctx.stroke();
+
+  // Rosy cheeks
+  ctx.fillStyle = "rgba(255,140,120,0.35)";
+  ctx.beginPath();
+  ctx.ellipse(-8, -4, 4, 2.5, -0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(8, -4, 4, 2.5, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawFireflies(ctx) {
+  fireflies.forEach(f => {
+    ctx.save();
+    ctx.globalAlpha = f.alpha * 0.85;
+    ctx.shadowColor = "#aaff44";
+    ctx.shadowBlur  = 8;
+    ctx.fillStyle   = "#ccff66";
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawParticles(ctx) {
+  particles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle   = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur  = 6;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawRipples(ctx) {
+  ripples.forEach(r => {
+    ctx.save();
+    ctx.globalAlpha = r.alpha;
+    ctx.strokeStyle = "#7fffcf";
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(r.x, r.y, r.r, r.r * 0.4, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
+/* ── KEY HANDLING ── */
+window.addEventListener("keydown", e => {
+  keys[e.key] = true;
+  if (activeGame === "frog" && [" ","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+    e.preventDefault();
+  }
+  // Wordle keys
+  if (activeGame === "wordle") {
+    const k = e.key.toUpperCase();
+    if (k === "ENTER" || k === "BACKSPACE") handleKey(k);
+    else if (k.length === 1 && /^[A-Z]$/.test(k)) handleKey(k);
+  }
+});
+
+window.addEventListener("keyup", e => {
+  keys[e.key] = false;
+});
+
+/* ════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════ */
+initWordle();
+loadPuzzle(0);
+// Draw static frog start screen
+(function drawFrogPreview() {
+  const ctx = fCtx;
+  drawSwampBg(ctx);
+  platforms = buildLevel ? [] : [];
+  buildLevel();
+  drawPlatforms(ctx);
+  coins = platforms.map((p, i) => ({
+    x: p.x + p.w / 2, y: p.y - 22, r: 9, collected: false, id: i, bob: 0
+  }));
+  drawCoins(ctx);
+  frog = { x: 60, y: 240, w: 30, h: 24, vx: 0, vy: 0, onGround: true, facing: 1, squish: 0, invincible: 0 };
+  fireflies = [];
+  spawnFireflies();
+  drawFireflies(ctx);
+  drawFrog(ctx);
+})();
+</script>
+</body>
+</html>
